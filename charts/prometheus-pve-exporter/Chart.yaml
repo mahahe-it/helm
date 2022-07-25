@@ -1,7 +1,7 @@
 apiVersion: v2
 name: prometheus-pve-exporter
 description: A Helm chart to export the metrics from pve in Prometheus format.
-version: 0.1.0
+version: 0.1.1
 appVersion: "2.2.3"
 keywords:
 - pve-exporter
@@ -12,8 +12,10 @@ annotations:
     - name: Upstream Project
       url: https://github.com/prometheus-pve/prometheus-pve-exporter
 maintainers:
-  - email: dries@stenic.io
-    name: Stenic
+  - email: matteob99@mahahe.it
+    name: MatteoB99
+  - email: haloghen@mahahe.it
+    name: Haloghen
 engine: gotpl
 home: https://github.com/prometheus-pve/prometheus-pve-exporter
 sources:
