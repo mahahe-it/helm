@@ -62,8 +62,8 @@ pve:
   target:
   user: root@pam
   password:
-  token_name:
-  token_value:
+  # token_name:
+  # token_value:
   verify_ssl: false
 
 serviceMonitor:

@@ -1,26 +1,26 @@
-{{- if and ( .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" ) ( .Values.exporter.serviceMonitor.enabled ) }}
+{{- if and ( .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" ) ( .Values.serviceMonitor.enabled ) }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ template "proetheus-pve-exporter.fullname" . }}
-  namespace: {{ .Values.exporter.serviceMonitor.namespace | default .Release.Namespace | quote }}
+  namespace: {{ .Values.serviceMonitor.namespace | default .Release.Namespace | quote }}
   labels:
 {{ include "labels.standard" . | indent 4 }}
     {{- range $key, $value := .Values.extraLabels }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
-    {{- range $key, $value := .Values.exporter.serviceMonitor.labels }}
+    {{- range $key, $value := .Values.serviceMonitor.labels }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
 spec:
   endpoints:
   - targetPort: {{ .Values.service.port }}
-{{- if .Values.exporter.serviceMonitor.interval }}
-    interval: {{ .Values.exporter.serviceMonitor.interval }}
+{{- if .Values.serviceMonitor.interval }}
+    interval: {{ .Values.serviceMonitor.interval }}
 {{- end }}
     path: /pve?target={{ .Values.pve.target }}
-{{- if .Values.exporter.serviceMonitor.timeout }}
-    scrapeTimeout: {{ .Values.exporter.serviceMonitor.timeout }}
+{{- if .Values.serviceMonitor.timeout }}
+    scrapeTimeout: {{ .Values.serviceMonitor.timeout }}
 {{- end }}
   jobLabel: {{ template "proetheus-pve-exporter.fullname" . }}
   namespaceSelector:
