@@ -48,3 +48,9 @@ jobs:
 
       - name: Run chart-testing (install)
         run: ct install --config ct.yaml
+
+      - name: Repository Dispatch
+          uses: peter-evans/repository-dispatch@v2
+          with:
+            token: ${{ secrets.REPO_ACCESS_TOKEN }}
+            event-type: lint-successful

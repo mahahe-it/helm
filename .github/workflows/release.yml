@@ -1,9 +1,8 @@
 name: Release Charts
 
 on:
-  push:
-    branches:
-      - main
+  repository_dispatch:
+    types: [lint-successful]
 
 jobs:
   release:
