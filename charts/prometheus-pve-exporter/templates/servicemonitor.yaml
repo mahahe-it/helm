@@ -30,5 +30,4 @@ spec:
     matchLabels:
       app: {{ template "prometheus-pve-exporter.name" . }}
       release: {{ .Release.Name }}
-      exporter: enabled
 {{- end }}
