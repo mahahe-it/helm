@@ -2,7 +2,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ template "proetheus-pve-exporter.fullname" . }}
+  name: {{ template "prometheus-pve-exporter.fullname" . }}
   namespace: {{ .Values.serviceMonitor.namespace | default .Release.Namespace | quote }}
   labels:
 {{ include "labels.standard" . | indent 4 }}
@@ -22,13 +22,13 @@ spec:
 {{- if .Values.serviceMonitor.timeout }}
     scrapeTimeout: {{ .Values.serviceMonitor.timeout }}
 {{- end }}
-  jobLabel: {{ template "proetheus-pve-exporter.fullname" . }}
+  jobLabel: {{ template "prometheus-pve-exporter.fullname" . }}
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace | quote }}
   selector:
     matchLabels:
-      app: {{ template "proetheus-pve-exporter.name" . }}
+      app: {{ template "prometheus-pve-exporter.name" . }}
       release: {{ .Release.Name }}
       exporter: enabled
 {{- end }}
