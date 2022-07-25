@@ -18,7 +18,9 @@ spec:
 {{- if .Values.serviceMonitor.interval }}
     interval: {{ .Values.serviceMonitor.interval }}
 {{- end }}
-    path: /pve?target={{ .Values.pve.target }}
+    path: /pve
+    params:
+      target:{{ .Values.pve.target }}
 {{- if .Values.serviceMonitor.timeout }}
     scrapeTimeout: {{ .Values.serviceMonitor.timeout }}
 {{- end }}
