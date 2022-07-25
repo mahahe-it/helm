@@ -1,0 +1,28 @@
+apiVersion: v1
+entries:
+  prometheus-pve-exporter:
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/stenic/helm-charts
+        - name: Upstream Project
+          url: https://github.com/prometheus-pve/prometheus-pve-exporter
+    apiVersion: v2
+    appVersion: 2.2.3
+    created: "2022-07-25T20:33:52.53495246Z"
+    description: A Helm chart to export the metrics from pve in Prometheus format.
+    digest: 31dcf12b7829733ca96bc9e5e4dac2990b4dab7134ee927688838619a194e17b
+    home: https://github.com/prometheus-pve/prometheus-pve-exporter
+    keywords:
+    - pve-exporter
+    maintainers:
+    - email: dries@stenic.io
+      name: Stenic
+    name: prometheus-pve-exporter
+    sources:
+    - https://github.com/prometheus-pve/prometheus-pve-exporter
+    - https://github.com/stenic/helm-charts/tree/master/charts/
+    urls:
+    - https://github.com/mahahe-it/helm/releases/download/prometheus-pve-exporter-0.1.0/prometheus-pve-exporter-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-07-25T20:33:52.377736421Z"
