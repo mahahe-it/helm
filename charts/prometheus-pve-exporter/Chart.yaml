@@ -8,7 +8,7 @@ keywords:
 annotations:
   "artifacthub.io/links": |
     - name: Chart Source
-      url: https://github.com/stenic/helm-charts
+      url: https://github.com/mahahe-it/helm
     - name: Upstream Project
       url: https://github.com/prometheus-pve/prometheus-pve-exporter
 maintainers:
@@ -18,4 +18,4 @@ engine: gotpl
 home: https://github.com/prometheus-pve/prometheus-pve-exporter
 sources:
   - https://github.com/prometheus-pve/prometheus-pve-exporter
-  - https://github.com/stenic/helm-charts/tree/master/charts/
+  - https://github.com/mahahe-it/helm/tree/master/charts/
