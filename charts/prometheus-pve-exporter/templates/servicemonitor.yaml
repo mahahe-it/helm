@@ -1,0 +1,36 @@
+{{- if and ( .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" ) ( .Values.exporter.serviceMonitor.enabled ) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "proetheus-pve-exporter.fullname" . }}
+  namespace: {{ .Values.exporter.serviceMonitor.namespace | default .Release.Namespace | quote }}
+  labels:
+{{ include "labels.standard" . | indent 4 }}
+    {{- range $key, $value := .Values.extraLabels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+    {{- range $key, $value := .Values.exporter.serviceMonitor.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  endpoints:
+  - targetPort: {{ .Values.service.port }}
+{{- if .Values.exporter.serviceMonitor.interval }}
+    interval: {{ .Values.exporter.serviceMonitor.interval }}
+{{- end }}
+    path: /pve?target={{ .Values.pve.target }}
+{{- if .Values.exporter.serviceMonitor.timeout }}
+    scrapeTimeout: {{ .Values.exporter.serviceMonitor.timeout }}
+{{- end }}
+  jobLabel: {{ template "proetheus-pve-exporter.fullname" . }}
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace | quote }}
+  selector:
+    matchLabels:
+      app: {{ template "proetheus-pve-exporter.name" . }}
+      release: {{ .Release.Name }}
+      exporter: enabled
+{{- end }}
+Footer
+© 2022 GitHub, Inc.
