@@ -52,3 +52,14 @@ Return the appropriate apiVersion for rbac.
 {{- print "rbac.authorization.k8s.io/v1beta1" -}}
 {{- end -}}
 {{- end -}} 
+
+{{- define "labels.standard" -}}
+app: {{ template "prometheus-pve-exporter.name" . }}
+heritage: {{ .Release.Service | quote }}
+release: {{ .Release.Name | quote }}
+chart: {{ template "chartref" . }}
+{{- end -}}
+
+{{- define "chartref" -}}
+  {{- replace "+" "_" .Chart.Version | printf "%s-%s" .Chart.Name -}}
+{{- end -}}

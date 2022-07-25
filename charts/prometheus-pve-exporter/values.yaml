@@ -66,6 +66,8 @@ pve:
   # token_value:
   verify_ssl: false
 
+extraLabels: {}
+
 serviceMonitor:
   # When set true then use a ServiceMonitor to configure scraping
   # enabled: false
