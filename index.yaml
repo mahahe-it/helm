@@ -9,6 +9,32 @@ entries:
           url: https://github.com/prometheus-pve/prometheus-pve-exporter
     apiVersion: v2
     appVersion: 2.2.3
+    created: "2022-07-25T21:49:03.57514878Z"
+    description: A Helm chart to export the metrics from pve in Prometheus format.
+    digest: 7f0e7d4a6aeaf91f1b4636139f50323a3d1828f18008e536ed2085b9098ed159
+    home: https://github.com/prometheus-pve/prometheus-pve-exporter
+    keywords:
+    - pve-exporter
+    maintainers:
+    - email: matteob99@mahahe.it
+      name: MatteoB99
+    - email: haloghen@mahahe.it
+      name: Haloghen
+    name: prometheus-pve-exporter
+    sources:
+    - https://github.com/prometheus-pve/prometheus-pve-exporter
+    - https://github.com/mahahe-it/helm/tree/master/charts/
+    urls:
+    - https://github.com/mahahe-it/helm/releases/download/prometheus-pve-exporter-0.1.6/prometheus-pve-exporter-0.1.6.tgz
+    version: 0.1.6
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/mahahe-it/helm
+        - name: Upstream Project
+          url: https://github.com/prometheus-pve/prometheus-pve-exporter
+    apiVersion: v2
+    appVersion: 2.2.3
     created: "2022-07-25T21:35:05.081407478Z"
     description: A Helm chart to export the metrics from pve in Prometheus format.
     digest: 6c2c787b6e1b5037c6b78097ab85ded1855ca0ee6143f8b1815ac184a9041084
