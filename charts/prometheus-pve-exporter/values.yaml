@@ -59,7 +59,7 @@ affinity: {}
 
 ## pve exporter configurations
 pve:
-  target:
+  target: []
   user: root@pam
   password:
   # token_name:
