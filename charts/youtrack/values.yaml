@@ -1,7 +1,7 @@
 ## @section Common Parameters
 ## @param replicaCount Number of Replicas to deploy
-## @param nameOverride String to partially override common.names.fullname 
-## @param fullnameOverride String to fully override common.names.fullname 
+## @param nameOverride String to partially override common.names.fullname
+## @param fullnameOverride String to fully override common.names.fullname
 replicaCount: 1
 nameOverride: ""
 fullnameOverride: ""
@@ -130,7 +130,7 @@ ingress:
   ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
   ##
   ingressClassName: ""
-  
+
   ## @param ingress.extraRules Additional rules to be covered with this ingress record
   ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
   ## e.g:
