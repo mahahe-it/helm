@@ -3,11 +3,11 @@
 YouTrack is a project management tool that can be adapted to your processes to help you deliver great products.
 
 [Overview of YouTrack](https://www.jetbrains.com/youtrack/)
-                           
+
 ## TL;DR
 
 ```console
-$ helm repo add mahahe https://charts.mahahe.it/
+$ helm repo add mahahe https://helm.mahahe.it/
 $ helm install my-release mahahe/youtrack
 ```
 
