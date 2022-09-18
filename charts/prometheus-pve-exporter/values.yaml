@@ -70,12 +70,12 @@ extraLabels: {}
 
 serviceMonitor:
   # When set true then use a ServiceMonitor to configure scraping
-  # enabled: false
+  enabled: false
   # Set the namespace the ServiceMonitor should be deployed
-  # namespace:
+  namespace: ""
   # Set how frequently Prometheus should scrape
-  # interval: 30s
+  interval: 30s
   # Set labels for the ServiceMonitor, use this to define your scrape label for Prometheus Operator
-  # labels: {}
+  labels: {}
   # Set timeout for scrape
-  # timeout: 10s
+  timeout: 10s
