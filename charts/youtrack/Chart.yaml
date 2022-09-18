@@ -1,0 +1,20 @@
+apiVersion: v2
+name: youtrack
+description: A Helm chart to install YouTrack in your Kubernetes Cluster
+version: 0.1.0
+appVersion: "2022.2"
+keywords:
+- youtrack
+- jetbrains
+annotations:
+  "artifacthub.io/links": |
+    - name: Chart Source
+      url: https://github.com/mahahe-it/helm
+maintainers:
+  - email: matteob99@mahahe.it
+    name: MatteoB99
+  - email: haloghen@mahahe.it
+    name: Haloghen
+home: https://www.jetbrains.com/youtrack/
+sources:
+  - https://github.com/mahahe-it/helm/tree/master/charts/
