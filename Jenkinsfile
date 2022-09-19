@@ -38,7 +38,7 @@ pipeline {
                         sh 'git config --global --add safe.directory \'*\''
                         sh "git fetch --no-tags origin ${env.CHANGE_TARGET}:refs/remotes/origin/${env.CHANGE_TARGET}"
                     }
-                    sh 'ct lint --config ct.yaml --charts youtrack'
+                    sh 'ct lint --config ct.yaml'
                 }
             }
         }
