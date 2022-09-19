@@ -30,7 +30,7 @@ pipeline {
             steps {
                 container('ct') {
                     sh "git fetch --no-tags origin ${env.CHANGE_TARGET}:refs/remotes/origin/${env.CHANGE_TARGET}"
-                    sh 'git config --global --add safe.directory *'
+                    sh 'git config --global --add safe.directory \'*\''
                     sh 'ct lint --config ct.yaml --charts youtrack'
                 }
             }
