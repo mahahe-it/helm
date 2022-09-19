@@ -42,5 +42,17 @@ pipeline {
                 }
             }
         }
+
+        stage('Install Helm Chart') {
+          when {
+            changeRequest()
+          }
+
+          steps {
+              container('ct') {
+                sh 'ct install --config ct.yaml'
+              }
+          }
+        }
     }
 }
