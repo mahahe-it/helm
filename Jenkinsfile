@@ -9,6 +9,10 @@ pipeline {
         - name: helm
           image: alpine/helm:3.9.4
           command: ['sleep', '999999']
+        - name: ct
+          image: quay.io/helmpack/chart-testing:3.7.0
+          command: ['sleep', '999999']
+
       '''
         }
     }
@@ -16,6 +20,14 @@ pipeline {
         stage('Echo') {
             steps {
                 echo 'Test'
+            }
+        }
+
+        stage('Lint Helm Chart') {
+            steps {
+                container('ct') {
+                    sh 'ct lint'
+                }
             }
         }
     }
