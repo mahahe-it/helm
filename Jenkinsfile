@@ -1,6 +1,7 @@
 pipeline {
     agent {
         kubernetes {
+            cloud 'development'
             inheritFrom 'default-dev'
             yaml '''
       spec:

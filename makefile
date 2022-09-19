@@ -12,3 +12,7 @@ test:
 	trap "kind delete cluster" EXIT SIGINT; \
 		kind create cluster; \
 		ct install --config ct.yaml
+git:
+	git add .
+	git commit -m "$t" -m "$b"
+	git push -u origin main
