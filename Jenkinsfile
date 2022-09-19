@@ -23,6 +23,10 @@ pipeline {
 
     stages {
         stage('Lint Helm Chart') {
+            when {
+                changeRequest()
+            }
+            
             steps {
                 container('ct') {
                     sh "git fetch --no-tags origin ${env.CHANGE_TARGET}:refs/remotes/origin/${env.CHANGE_TARGET}"
