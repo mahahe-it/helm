@@ -25,8 +25,7 @@ pipeline {
         stage('Lint Helm Chart') {
             steps {
                 container('ct') {
-                    checkout scm
-                    sh 'ct lint'
+                    sh 'ct lint --config ct.yaml'
                 }
             }
         }
