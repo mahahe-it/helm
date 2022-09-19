@@ -25,8 +25,7 @@ pipeline {
         stage('Lint Helm Chart') {
             steps {
                 container('ct') {
-                    sh 'git config --global --add safe.directory \'*\''
-                    sh 'git fetch --unshallow'
+                    sh "git fetch --no-tags origin ${CHANGE_TARGET}:refs/remotes/origin/${CHANGE_TARGET}"
                     sh 'ct lint --config ct.yaml --charts youtrack'
                 }
             }
