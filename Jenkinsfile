@@ -25,6 +25,7 @@ pipeline {
         stage('Lint Helm Chart') {
             steps {
                 container('ct') {
+                    sh 'git fetch --unshallow'
                     sh 'ct lint --config ct.yaml --charts youtrack'
                 }
             }
