@@ -7,7 +7,7 @@ pipeline {
         containers:
         - name: jnlp
           image: jenkins/inbound-agent:latest-jdk11
-          command: ['sleep', '999999']
+          command: ['/usr/local/bin/jenkins-agent']
         - name: helm
           image: alpine/helm:3.9.4
           command: ['sleep', '999999']
@@ -26,6 +26,7 @@ pipeline {
             steps {
                 container('ct') {
                     sh 'pwd'
+                    sh 'ls -la'
                     sh 'ct lint'
                 }
             }
