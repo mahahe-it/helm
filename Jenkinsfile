@@ -16,7 +16,10 @@ pipeline {
           image: quay.io/helmpack/chart-testing:v3.7.0
           command: ['sleep', '999999']
           tty: true
-
+        dnsConfig:
+          options:
+            - name: ndots
+              value: "2"
       '''
         }
     }
