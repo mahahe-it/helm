@@ -16,13 +16,8 @@ pipeline {
       '''
         }
     }
-    stages {
-        stage('Echo') {
-            steps {
-                echo 'Test'
-            }
-        }
 
+    stages {
         stage('Lint Helm Chart') {
             steps {
                 container('ct') {
