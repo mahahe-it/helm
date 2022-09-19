@@ -25,6 +25,7 @@ pipeline {
         stage('Lint Helm Chart') {
             steps {
                 container('ct') {
+                    sh 'pwd'
                     sh 'ct lint'
                 }
             }
