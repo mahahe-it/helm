@@ -32,8 +32,12 @@ pipeline {
 
             steps {
                 container('ct') {
-                    sh 'git config --global --add safe.directory \'*\''
-                    sh "git fetch --no-tags origin ${env.CHANGE_TARGET}:refs/remotes/origin/${env.CHANGE_TARGET}"
+                    withCredentials([gitUsernamePassword(
+                            credentialsId: '3aa88b4c-320d-41fa-8ccb-8af7e350f671', gitToolName: 'git-tool'
+                        )]) {
+                        sh 'git config --global --add safe.directory \'*\''
+                        sh "git fetch --no-tags origin ${env.CHANGE_TARGET}:refs/remotes/origin/${env.CHANGE_TARGET}"
+                    }
                     sh 'ct lint --config ct.yaml --charts youtrack'
                 }
             }
