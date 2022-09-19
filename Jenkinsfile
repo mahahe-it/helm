@@ -25,7 +25,7 @@ pipeline {
         stage('Lint Helm Chart') {
             steps {
                 container('ct') {
-                    sh 'ct lint --config ct.yaml'
+                    sh 'ct lint --config ct.yaml --chart youtrack'
                 }
             }
         }
