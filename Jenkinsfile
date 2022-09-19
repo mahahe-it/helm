@@ -10,7 +10,7 @@ pipeline {
           image: alpine/helm:3.9.4
           command: ['sleep', '999999']
         - name: ct
-          image: quay.io/helmpack/chart-testing:3.7.0
+          image: quay.io/helmpack/chart-testing:v3.7.0
           command: ['sleep', '999999']
 
       '''
