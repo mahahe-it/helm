@@ -53,7 +53,7 @@ spec:
         name: data
       spec:
         accessModes: {{ .Values.persistence.accessModes }}
-        storageClassName: {{ .Values.persistence.accessModes | quote | default null }}
+        storageClassName: {{ .Values.persistence.storageClass }}
         resources:
           requests:
             storage: {{ .Values.persistence.size }}

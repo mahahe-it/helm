@@ -186,7 +186,7 @@ affinity: {}
 ## @param persistence.accessModes Access Modes for the PVC
 ## @param persistence.size Size of the data PVC
 persistence:
-  storageClass: ''
+  storageClass: null
   accessModes:
     - "ReadWriteOnce"
   size: 32Gi
