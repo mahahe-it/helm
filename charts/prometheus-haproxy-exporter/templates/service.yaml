@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "prometheus-haproxy-exporter.fullname" . }}
+  labels:
+    app: {{ template "prometheus-haproxy-exporter.name" . }}
+    chart: {{ template "prometheus-haproxy-exporter.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "prometheus-haproxy-exporter.name" . }}
+    release: {{ .Release.Name }}

@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "prometheus-haproxy-exporter.fullname" . }}
+  labels:
+    app: {{ template "prometheus-haproxy-exporter.name" . }}
+    chart: {{ template "prometheus-haproxy-exporter.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "prometheus-haproxy-exporter.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "prometheus-haproxy-exporter.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ template "prometheus-haproxy-exporter.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- if .Values.haproxy.command}}
+          command: [ {{ .Values.haproxy.command }}]
+          {{- end}}
+          args:
+          {{- if .Values.haproxy.scrapeUri }}
+            - --haproxy.scrape-uri={{ .Values.haproxy.scrapeUri | quote}}
+          {{- end }}
+          {{- if eq  .Values.haproxy.verify_ssl false}}
+            - --no-haproxy.ssl-verify
+          {{- end}}
+          {{- range .Values.haproxy.ExtraArgs }}
+          - {{ . }}
+          {{- end }}
+
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 9101
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 60
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
