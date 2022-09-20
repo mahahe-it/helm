@@ -34,6 +34,8 @@ jobs:
         run: |
           cd hugo
           hugo --minify
+          cp ./public ../public
+          cd ..
       
       - name: Delpoy Hugo
         uses: peaceiris/actions-gh-pages@v3
