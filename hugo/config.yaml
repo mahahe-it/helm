@@ -1,0 +1,9 @@
+baseURL: 'http://example.org/'
+languageCode: 'en-us'
+title: 'Mahahe Helm Repository'
+theme: terminal
+params:
+  centerTheme: true
+  enableGitInfo: true
+  themeColor: green
+  
