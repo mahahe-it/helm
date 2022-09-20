@@ -146,6 +146,8 @@ ingress:
   ##
   extraRules: []
 
+
+  ## @section Advanced parameters
   ## @param resources.limits The resources limits for the YouTrack server containers
   ## @param resources.requests The requested resources for the YouTrack server containers
   ##
@@ -177,3 +179,40 @@ tolerations: []
 ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
 ##
 affinity: {}
+
+
+# ## @section Storage Parameters
+# ## @param persistence.global.storageClass Storage class for every PVC
+# ## @param persistence.global.accessModes Access Modes for every PVC
+# ## @param persistence.data.storageClass Storage class for the data PVC
+# ## @param persistence.data.accessModes Access Modes for the data PVC
+# ## @param persistence.data.size Size of the data PVC
+# ## @param persistence.conf.storageClass Storage class for the conf PVC
+# ## @param persistence.conf.accessModes Access Modes for the conf PVC
+# ## @param persistence.conf.size Size of the conf PVC
+# ## @param persistence.logs.storageClass Storage class for the logs PVC
+# ## @param persistence.logs.accessModes Access Modes for the logs PVC
+# ## @param persistence.logs.size Size of the logs PVC
+# ## @param persistence.backups.storageClass Storage class for the backups PVC
+# ## @param persistence.backups.accessModes Access Modes for the backups PVC
+# ## @param persistence.backups.size Size of the backups PVC
+# persistence:
+#   global:
+#     storageClass: ''
+#     accessModes: []
+#   data:
+#     storageClass: ''
+#     accessModes: ['ReadWriteOnce']
+#     size: 10Gi
+#   conf:
+#     storageClass: ''
+#     accessModes: ['ReadWriteOnce']
+#     size: 1Gi
+#   logs:
+#     storageClass: ''
+#     accessModes: ['ReadWriteOnce']
+#     size: 2Gi
+#   backups:
+#     storageClass: ''
+#     accessModes: ['ReadWriteOnce']
+#     size: 10Gi
