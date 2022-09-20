@@ -32,8 +32,18 @@ jobs:
 
       - name: Build Hugo
         run: |
+          pwd
+          ls -la
           cd hugo
+          pwd
+          ls -la
           hugo --minify
+          pwd
+          ls -la
+          cd public
+          pwd
+          ls -la
+          cd ..
           cp -r ./public ../public
           cd ..
       
@@ -42,5 +52,5 @@ jobs:
         # if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./hugo/public
+          publish_dir: ./public
           
