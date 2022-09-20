@@ -34,7 +34,7 @@ jobs:
         run: |
           cd hugo
           hugo --minify
-          cp ./public ../public
+          cp -r ./public ../public
           cd ..
       
       - name: Delpoy Hugo
