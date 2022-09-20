@@ -32,35 +32,24 @@ jobs:
 
       - name: Build Hugo
         run: |
-          pwd
-          ls -la
           git submodule init
           git submodule update
           cd hugo
+          hugo --minify
+          cd public
           pwd
           ls -la
-          hugo --minify
+          cd ..
+          cp -r ./public ../public
+          cd ..
           pwd
           ls -la
           cd public
           pwd
           ls -la
           cd ..
-          cd themes/terminal
-          pwd
-          ls -la
-          cd ..
-          cd ..
-          cat config.yaml
-          cd content
-          pwd
-          ls -la
-          cat index.md
-          cd ..
-          cp -r ./public ../public
-          cd ..
       
-      - name: Delpoy Hugo
+      - name: Deploy Hugo
         uses: peaceiris/actions-gh-pages@v3
         # if: github.ref == 'refs/heads/main'
         with:
