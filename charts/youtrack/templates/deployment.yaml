@@ -35,13 +35,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: data
-              mountPath: /opt/youtrack/data
-            - name: conf
-              mountPath: /opt/youtrack/conf
-            - name: logs
-              mountPath: /opt/youtrack/logs
-            - name: backups
-              mountPath: /opt/youtrack/backups
+              mountPath: /opt/youtrack
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -58,28 +52,8 @@ spec:
     - metadata:
         name: data
       spec:
-        accessModes: [ "ReadWriteOnce" ]
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.accessModes | quote | default null }}
         resources:
           requests:
-            storage: 10Gi
-    - metadata:
-        name: conf
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 1Gi
-    - metadata:
-        name: logs
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 2Gi
-    - metadata:
-        name: backups
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 10Gi
+            storage: {{ .Values.persistence.size }}
