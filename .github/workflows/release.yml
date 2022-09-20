@@ -34,6 +34,8 @@ jobs:
         run: |
           pwd
           ls -la
+          git submodule init
+          git submodule update
           cd hugo
           pwd
           ls -la
@@ -45,11 +47,13 @@ jobs:
           ls -la
           cd ..
           cd themes/terminal
+          pwd
           ls -la
           cd ..
           cd ..
           cat config.yaml
           cd content
+          pwd
           ls -la
           cat index.md
           cd ..
