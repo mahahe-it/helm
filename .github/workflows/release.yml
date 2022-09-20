@@ -44,6 +44,15 @@ jobs:
           pwd
           ls -la
           cd ..
+          cd themes/terminal
+          ls -la
+          cd ..
+          cd ..
+          cat config.yaml
+          cd content
+          ls -la
+          cat index.md
+          cd ..
           cp -r ./public ../public
           cd ..
       
