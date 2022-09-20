@@ -180,7 +180,6 @@ tolerations: []
 ##
 affinity: {}
 
-
 ## @section Storage Parameters
 ## @param persistence.storageClass Storage class for the PVC
 ## @param persistence.accessModes Access Modes for the PVC
