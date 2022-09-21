@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          submodule: true
+          submodule: recusive
           fetch-depth: 0
 
       - name: Configure Git
@@ -31,12 +31,16 @@ jobs:
 
       - name: Build Hugo
         run: |
+          git submodule init
+          git submodule update
           cd hugo
           hugo --minify
+          cp -r ./public ../public
+          cd ..
       
-      - name: Delpoy Hugo
+      - name: Deploy Hugo
         uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/main'
+        # if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
