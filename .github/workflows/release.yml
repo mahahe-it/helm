@@ -3,7 +3,6 @@ name: Release Charts
 on:
   repository_dispatch:
     types: [lint-successful]
-  push:
 
 jobs:
   release:
@@ -36,17 +35,7 @@ jobs:
           git submodule update
           cd hugo
           hugo --minify
-          cd public
-          pwd
-          ls -la
-          cd ..
           cp -r ./public ../public
-          cd ..
-          pwd
-          ls -la
-          cd public
-          pwd
-          ls -la
           cd ..
       
       - name: Deploy Hugo
