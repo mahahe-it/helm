@@ -1,0 +1,32 @@
+apiVersion: v1
+entries:
+  prometheus-haproxy-exporter:
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/mahahe-it/helm
+        - name: Upstream Project
+          url: https://github.com/prometheus/haproxy_exporter
+    apiVersion: v2
+    appVersion: v0.13.0
+    created: "2022-09-29T22:38:25.575477459Z"
+    description: A Helm chart to export the metrics from haproxy in Prometheus format.
+    digest: 07d514f18703ccb07849085cb90f6e7ff6188843f8e193347f9798f45a02ea40
+    home: https://github.com/prometheus/haproxy_exporter
+    keywords:
+    - haproxy-exporter
+    - prometheus
+    - haproxy
+    maintainers:
+    - email: matteob99@mahahe.it
+      name: MatteoB99
+    - email: haloghen@mahahe.it
+      name: Haloghen
+    name: prometheus-haproxy-exporter
+    sources:
+    - https://github.com/prometheus/haproxy_exporter
+    - https://github.com/mahahe-it/helm/tree/master/charts/
+    urls:
+    - https://github.com/mahahe-it/helm/releases/download/prometheus-haproxy-exporter-0.1.1/prometheus-haproxy-exporter-0.1.1.tgz
+    version: 0.1.1
+generated: "2022-09-29T22:38:25.118269342Z"
