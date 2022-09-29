@@ -28,7 +28,7 @@ spec:
           {{- end}}
           args:
           {{- if .Values.haproxy.scrapeUri }}
-            - --haproxy.scrape-uri={{ .Values.haproxy.scrapeUri | quote}}
+            - --haproxy.scrape-uri={{ .Values.haproxy.scrapeUri }}
           {{- end }}
           {{- if eq  .Values.haproxy.verify_ssl false}}
             - --no-haproxy.ssl-verify
