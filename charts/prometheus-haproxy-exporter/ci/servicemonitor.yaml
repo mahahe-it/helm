@@ -1,3 +1,2 @@
 serviceMonitor:
   enabled: true
-  namespace: test-namespace
