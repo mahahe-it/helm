@@ -1,0 +1,135 @@
+# Default values for prometheus-haproxy-exporter.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## @section Rbac
+## @param rbac.create Specifies whether RBAC resources should be created
+## @param rbac.pspEnabled Specifies whether a PodSecurityPolicy should be created
+rbac:
+  create: true
+  pspEnabled: true
+
+## @section serviceAccount
+## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+## @param serviceAccount.name The name of the ServiceAccount to use.
+#  # If not set and create is true, a name is generated using the fullname template
+
+serviceAccount:
+  create: true
+  name:
+
+## @param replicaCount Desired number of scaper pods
+replicaCount: 1
+
+## @section Image Parameters
+## @param image.repository DockerHub image repository to use
+## @param image.tag Image tag to use
+## @param image.pullPolicy Pull Policy for the image
+image:
+  repository: quay.io/prometheus/haproxy-exporter
+  tag: "v0.13.0"
+  pullPolicy: IfNotPresent
+
+
+## @section Service Parameters
+## @param service.type Type of Service to deploy
+## @param service.port Port to use for prometheus-haproxy-exporter
+service:
+  type: ClusterIP
+  port: 9101
+
+
+## @section Ingress Parameters
+## Configure the ingress for the prometheus-haproxy-exporter server
+## Ref: https://kubernetes.io/docs/user-guide/ingress/
+## @param ingress.enabled Enable the creation of an ingress for the  server
+## @param ingress.annotations Annotations for the prometheus-haproxy-exporter server ingress. To enable certificate autogeneration, place here your cert-manager annotations.
+## @param ingress.tls List of secret for tls key
+## @param ingress.path path to serve ingress
+## @param ingress.hosts Ingress hostname for the prometheus-haproxy-exporter server ingress
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    # - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+## @section haproxy Parameters
+## Configure the haproxy config
+## ref: https://github.com/prometheus/haproxy_exporter#usage
+## @param haproxy.verify_ssl Enable check if haproxy have valid ssl
+## @param haproxy.scrapeUri Url to scrape at example https://haproxy.example.com/haproxy?stats;csv
+## @param haproxy.ExtraArgs extra args pass to container startup
+haproxy:
+  verify_ssl: false
+  scrapeUri: https://haproxy.example.com/haproxy?stats;csv
+  ExtraArgs: []
+
+## @section Advanced parameters
+## @param resources.limits The resources limits for the YouTrack server containers
+## @param resources.requests The requested resources for the YouTrack server containers
+##
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits: {}
+  #  cpu: 100m
+  #  memory: 128Mi
+  requests: {}
+  #  cpu: 100m
+  #  memory: 128Mi
+
+
+## @param nodeSelector Node labels for YouTrack server pods assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## @param tolerations Tolerations for YouTrack server pods assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
+
+
+## @param affinity Affinity for YouTrack server pods
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
+##
+affinity: {}
+
+
+## @param extraLabels add extraLabels to all object
+extraLabels: {}
+
+
+## Prometheus Operator ServiceMonitor configuration
+##
+## @param serviceMonitor.enabled Create ServiceMonitor resource for scraping metrics using PrometheusOperator
+## @param serviceMonitor.namespace Namespace in which Prometheus is running
+## @param serviceMonitor.interval Interval at which metrics should be scraped
+## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+## @param serviceMonitor.labels Extra labels for the ServiceMonitor
+## @param serviceMonitor.timeout Specify the timeout after which the scrape is ended
+## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+## e.g:
+## timeout: 10s
+
+serviceMonitor:
+  # When set true then use a ServiceMonitor to configure scraping
+  enabled: false
+  # Set the namespace the ServiceMonitor should be deployed
+  namespace:
+  # Set how frequently Prometheus should scrape
+  interval: 30s
+  # Set labels for the ServiceMonitor, use this to define your scrape label for Prometheus Operator
+  labels: {}
+  # Set timeout for scrape
+  timeout: 10s
