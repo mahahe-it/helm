@@ -9,9 +9,9 @@ helm install my-release mahahe/prometheus-haproxy-exporter
 
 ## Introduction
 
-A Prometheus exporter for [Proxmox Virtual Environment](https://proxmox.com/en/proxmox-ve) metrics.
+A Prometheus exporter for [haproxy](http://www.haproxy.org/) metrics.
 
-This chart bootstraps a [PVE Exporter](https://github.com/gesellix/pve-prometheus-exporter) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps a [haproxy exporter](https://github.com/prometheus/haproxy_exporter) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 ## Prerequisites
 
@@ -40,43 +40,75 @@ helm delete my-release
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
 
-## Configuration
+## Parameters
 
-Add the following to your prometheus configuration:
+### Rbac
+
+| Name              | Description                                             | Value  |
+| ----------------- | ------------------------------------------------------- | ------ |
+| `rbac.create`     | Specifies whether RBAC resources should be created      | `true` |
+| `rbac.pspEnabled` | Specifies whether a PodSecurityPolicy should be created | `true` |
 
 
+### serviceAccount
 
-The following tables list the configurable parameters of the prometheus-haproxy-exporter chart and their default values.
+| Name                    | Description                                          | Value  |
+| ----------------------- | ---------------------------------------------------- | ------ |
+| `serviceAccount.create` | Specifies whether a ServiceAccount should be created | `true` |
+| `serviceAccount.name`   | The name of the ServiceAccount to use.               | `nil`  |
+| `replicaCount`          | Desired number of scaper pods                        | `1`    |
 
-| Key                   | Type   | Default                                                    | Description |
-|-----------------------|--------|------------------------------------------------------------|-------------|
-| affinity              | object | `{}`                                                       |  |
-| image.pullPolicy      | string | `"IfNotPresent"`                                           |  |
-| image.repository      | string | `"prompve/prometheus-haproxy-exporter"`                    |  |
-| image.tag             | string | `""`                                                       |  |
-| ingress.annotations   | object | `{}`                                                       |  |
-| ingress.enabled       | bool   | `false`                                                    |  |
-| ingress.hosts         | string | `nil`                                                      |  |
-| ingress.path          | string | `"/"`                                                      |  |
-| ingress.tls           | list   | `[]`                                                       |  |
-| nodeSelector          | object | `{}`                                                       |  |
-| haproxy.scrapeUri     | string | `"http://user:pass@haproxy.example.com/haproxy?stats;csv"` |  |
-| haproxy.verify_ssl    | string | `false`                                                    |  |
-| haproxy.ExtraArgs     | list   | `[]`                                                         |  |
-| rbac.create           | bool   | `true`                                                     |  |
-| rbac.pspEnabled       | bool   | `true`                                                     |  |
-| replicaCount          | int    | `1`                                                        |  |
-| resources             | object | `{}`                                                       |  |
-| service.port          | int    | `9101`                                                     |  |
-| service.type          | string | `"ClusterIP"`                                              |  |
-| serviceAccount.create | bool   | `true`                                                     |  |
-| serviceAccount.name   | string | `nil`                                                      |  |
-| tolerations           | list   | `[]`                                                       |  |
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
+### Image Parameters
 
-Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
+| Name               | Description                       | Value                                 |
+| ------------------ | --------------------------------- | ------------------------------------- |
+| `image.repository` | DockerHub image repository to use | `quay.io/prometheus/haproxy-exporter` |
+| `image.tag`        | Image tag to use                  | `v0.13.0`                             |
+| `image.pullPolicy` | Pull Policy for the image         | `IfNotPresent`                        |
 
-```console
-helm install my-release -f values.yaml mahahe/prometheus-haproxy-exporter
-```
+
+### Service Parameters
+
+| Name           | Description                                 | Value       |
+| -------------- | ------------------------------------------- | ----------- |
+| `service.type` | Type of Service to deploy                   | `ClusterIP` |
+| `service.port` | Port to use for prometheus-haproxy-exporter | `9101`      |
+
+
+### Ingress Parameters
+
+| Name                  | Description                                                                                                                                     | Value   |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `ingress.enabled`     | Enable the creation of an ingress for the  server                                                                                               | `false` |
+| `ingress.annotations` | Annotations for the prometheus-haproxy-exporter server ingress. To enable certificate autogeneration, place here your cert-manager annotations. | `{}`    |
+| `ingress.tls`         | List of secret for tls key                                                                                                                      | `[]`    |
+| `ingress.path`        | path to serve ingress                                                                                                                           | `/`     |
+| `ingress.hosts`       | Ingress hostname for the prometheus-haproxy-exporter server ingress                                                                             | `nil`   |
+
+
+### haproxy Parameters
+
+| Name                 | Description                                                            | Value                                           |
+| -------------------- | ---------------------------------------------------------------------- | ----------------------------------------------- |
+| `haproxy.verify_ssl` | Enable check if haproxy have valid ssl                                 | `false`                                         |
+| `haproxy.scrapeUri`  | Url to scrape at example https://haproxy.example.com/haproxy?stats;csv | `https://haproxy.example.com/haproxy?stats;csv` |
+| `haproxy.ExtraArgs`  | extra args pass to container startup                                   | `[]`                                            |
+
+
+### Advanced parameters
+
+| Name                       | Description                                                                  | Value   |
+| -------------------------- | ---------------------------------------------------------------------------- | ------- |
+| `resources.limits`         | The resources limits for the YouTrack server containers                      | `{}`    |
+| `resources.requests`       | The requested resources for the YouTrack server containers                   | `{}`    |
+| `nodeSelector`             | Node labels for YouTrack server pods assignment                              | `{}`    |
+| `tolerations`              | Tolerations for YouTrack server pods assignment                              | `[]`    |
+| `affinity`                 | Affinity for YouTrack server pods                                            | `{}`    |
+| `extraLabels`              | add extraLabels to all object                                                | `{}`    |
+| `serviceMonitor.enabled`   | Create ServiceMonitor resource for scraping metrics using PrometheusOperator | `false` |
+| `serviceMonitor.namespace` | Namespace in which Prometheus is running                                     | `nil`   |
+| `serviceMonitor.interval`  | Interval at which metrics should be scraped                                  | `30s`   |
+| `serviceMonitor.labels`    | Extra labels for the ServiceMonitor                                          | `{}`    |
+| `serviceMonitor.timeout`   | Specify the timeout after which the scrape is ended                          | `10s`   |
+

@@ -20,7 +20,7 @@ spec:
 {{- end }}
     path: /metrics
     params:
-      target: {{ .Values.pve.target }}
+      target: {{ .Values.haproxy.scrapeUri }}
 {{- if .Values.serviceMonitor.timeout }}
     scrapeTimeout: {{ .Values.serviceMonitor.timeout }}
 {{- end }}
