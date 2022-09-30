@@ -1,6 +1,9 @@
 name: Release Charts
 
 on:
+  push:
+    branches:
+      - ci/fix/helm-release
   repository_dispatch:
     types: [lint-successful]
 
@@ -58,4 +61,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
           cname: helm.mahahe.it
-          
+          keep_files: true
