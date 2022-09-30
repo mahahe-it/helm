@@ -8,7 +8,7 @@ on:
     types: [lint-successful]
 
 jobs:
-  release_helm:
+  release_on_github:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
