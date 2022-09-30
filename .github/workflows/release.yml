@@ -1,9 +1,6 @@
 name: Release Charts
 
 on:
-  push:
-    branches:
-      - ci/fix/helm-release
   repository_dispatch:
     types: [lint-successful]
 
