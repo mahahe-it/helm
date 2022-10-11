@@ -1,0 +1,20 @@
+apiVersion: v2
+name: foundryvtt
+description: A Helm chart to install foundryvtt in your Kubernetes Cluster
+version: 0.1.0
+appVersion: "10.287.0"
+keywords:
+- foundryvtt
+- foundry
+- vtt
+annotations:
+  "artifacthub.io/links": |
+    - name: Chart Source
+      url: https://github.com/mahahe-it/helm/tree/main/charts/foundryvtt
+maintainers:
+  - email: devops@mahahe.it
+    name: MaHaHe
+    url: https://www.mahahe.it/
+home: https://foundryvtt.com/
+sources:
+  - https://github.com/mahahe-it/helm/tree/main/charts/foundryvtt
