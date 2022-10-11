@@ -18,3 +18,4 @@ maintainers:
 home: https://foundryvtt.com/
 sources:
   - https://github.com/mahahe-it/helm/tree/main/charts/foundryvtt
+icon: https://foundryvtt.com/static/assets/icons/fvtt.png
