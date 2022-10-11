@@ -194,5 +194,5 @@ persistence:
     accessModes: []
   data:
     storageClass: ''
-    accessModes: [ 'ReadWriteOnce' ]
+    accessModes: ['ReadWriteOnce']
     size: "8Gi"
