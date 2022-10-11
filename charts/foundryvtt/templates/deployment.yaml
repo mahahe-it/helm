@@ -56,13 +56,14 @@ spec:
         accessModes: {{ .Values.persistence.global.accessModes }}
         {{- else }}
         accessModes: {{ .Values.persistence.data.accessModes }}
+        {{- end}}
         {{- if eq .Values.persistence.global.storageClass "-" }}
         storageClassName: default
         {{- else if .Values.persistence.global.storageClass }}
         storageClassName: {{ .Values.persistence.global.storageClass }}
         {{- else}}
         storageClassName: {{ .Values.persistence.data.storageClass }}
+        {{- end }}
         resources:
           requests:
             storage: {{ .Values.persistence.data.size }}
-
