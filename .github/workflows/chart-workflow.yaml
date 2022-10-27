@@ -6,7 +6,7 @@ on:
 jobs:
   lint-test:
     name: "Lint and Test"
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2.4.2
@@ -54,7 +54,7 @@ jobs:
 
   release_on_nexus:
     name: Release Chart on Nexus
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     needs: lint-test
     if: github.ref == 'refs/heads/master'
     steps:
