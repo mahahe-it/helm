@@ -179,9 +179,13 @@ spec:
             - name: FOUNDRY_WORLD
               value: {{ .Values.foundryvtt.world | quote }}
           {{- end }}
+      {{- if or (.Values.persistence.enabled) (.Values.foundryvtt.s3.enabled) }}
           volumeMounts:
+      {{- end }}
+      {{- if .Values.persistence.enabled }}
             - name: data
               mountPath: /data
+      {{- end }}
       {{- if .Values.foundryvtt.s3.enabled }}
             - name: secret-aws
               mountPath: "/etc/secretaws/"
