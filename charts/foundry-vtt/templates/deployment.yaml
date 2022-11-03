@@ -182,7 +182,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-      {{- if eq .Values.foundryvtt.s3.awsConfig "file" }}
+      {{- if .Values.foundryvtt.s3.enabled }}
             - name: secret-aws
               mountPath: "/etc/secretaws/"
               readOnly: true
