@@ -1,0 +1,19 @@
+apiVersion: v2
+name: foundry-vtt
+description: Foundry Virtual Tabletop
+type: application
+version: 0.1.0
+appVersion: "v10.288"
+keywords:
+  - game
+  - server
+  - vtt
+  - virtualtabletop
+  - foundryvtt
+  - foundry
+sources:
+  - https://github.com/mahahe-it/helm/tree/main/charts/foundry-vtt
+maintainers:
+  - name: MaHaHe DevOps
+    email: devops@mahahe.it
+    url: https://www.mahahe.it/
