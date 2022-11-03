@@ -1,0 +1,4 @@
+foundryvtt:
+  adminPassword: "admin"
+  username: "test"
+  password: "password"
