@@ -2,3 +2,5 @@ foundryvtt:
   adminPassword: "admin"
   username: "test"
   password: "password"
+persistence:
+  enabled: false
