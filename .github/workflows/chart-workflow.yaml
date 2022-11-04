@@ -30,7 +30,6 @@ jobs:
 
       - name: "Save Testing Values from Secret"
         shell: bash
-        if: github.ref_name == 'chart/foundryvtt'
         env:
           SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
         run: echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
