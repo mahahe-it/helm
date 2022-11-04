@@ -30,7 +30,7 @@ jobs:
 
       - name: "Save Testing Values from Secret"
         shell: bash
-        if: github.ref == '/refs/heads/charts/foundryvtt'
+        if: github.ref == 'refs/heads/charts/foundryvtt'
         env:
           SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
         run: |
