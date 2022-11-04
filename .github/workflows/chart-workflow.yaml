@@ -33,11 +33,7 @@ jobs:
         if: github.ref_name == 'chart/foundryvtt'
         env:
           SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
-        run: |
-          pwd
-          ls -la ./charts/foundry-vtt/ci/
-          cat ./charts/foundry-vtt/ci/test-values.yaml | base64 -w 0
-          echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
+        run: echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
 
       - name: "Run chart-testing (list-changed)"
         id: list-changed
