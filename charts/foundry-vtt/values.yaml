@@ -163,7 +163,7 @@ foundryvtt:
   ## Sets the maximum UDP port used by the internal [TURN relay server](https://foundryvtt.com/article/audio-video/).  This value must be greater than `49152`.  _Note: To use the internal relay server its ports must be published.
   # turnMaxPort: 52300
 
-  ## Allow Universal Plug and Play to automatically request port forwarding for the Foundry VTT port to your local network address. Default is true.
+  ## Allow Universal Plug and Play to automatically request port forwarding for the Foundry VTT port to your local network address. Default is false.
   upnp: false
 
   ## Version of Foundry VTT to install.
