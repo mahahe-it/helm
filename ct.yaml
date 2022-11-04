@@ -4,3 +4,4 @@ chart-dirs:
 helm-extra-args: --timeout 900s
 target-branch: main
 validate-maintainers: false
+check-version-increment: false
