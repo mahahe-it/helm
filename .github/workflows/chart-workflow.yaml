@@ -1,10 +1,11 @@
 name: Lint, Test and Deploy Charts
 on:
   push:
-    branches:
-      - main
-      - chart/**
+    paths:
+      - charts/**
   pull_request:
+    paths:
+      - charts/**
 
 jobs:
   lint-test:
