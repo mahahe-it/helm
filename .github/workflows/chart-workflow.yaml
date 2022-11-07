@@ -7,7 +7,6 @@ jobs:
   lint-test:
     name: "Lint and Test"
     runs-on: ubuntu-22.04
-    if: github.ref != 'refs/heads/main'
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2.4.2
@@ -16,16 +15,19 @@ jobs:
 
       - name: "Set Up Helm"
         uses: azure/setup-helm@v3.3
+        if: github.ref != 'refs/heads/main'
         with:
           version: v3.4.1
 
       - name: "Set Up Python"
         uses: actions/setup-python@v4.2.0
+        if: github.ref != 'refs/heads/main'
         with:
           python-version: 3.9
 
       - name: "Set up chart-testing"
         uses: helm/chart-testing-action@v2.3.0
+        if: github.ref != 'refs/heads/main'
         with:
           version: v3.3.0
 
@@ -34,9 +36,11 @@ jobs:
         env:
           SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
         run: echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
+        if: github.ref != 'refs/heads/main'
 
       - name: "Run chart-testing (list-changed)"
         id: list-changed
+        if: github.ref != 'refs/heads/main'
         run: |
           changed=$(ct list-changed --config ct.yaml)
           if [[ -n "$changed" ]]; then
@@ -45,25 +49,26 @@ jobs:
 
       - name: "Run chart-testing (lint)"
         run: ct lint --config ct.yaml
-        if: steps.list-changed.outputs.changed == 'true'
+        if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.4.0
-        if: steps.list-changed.outputs.changed == 'true'
+        if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
 
       - name: Run chart-testing (install)
         run: ct install --config ct.yaml
-        if: steps.list-changed.outputs.changed == 'true'
+        if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
 
       - name: Get Branch name
         id: branch-name
         uses: tj-actions/branch-names@v6
+        if: github.ref != 'refs/heads/main'
 
   release_on_nexus:
     name: Release Chart on Nexus
     runs-on: ubuntu-22.04
     needs: lint-test
-    if: ${{ always() }} && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
