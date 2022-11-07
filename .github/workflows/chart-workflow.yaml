@@ -1,7 +1,11 @@
 name: Lint, Test and Deploy Charts
 on:
   push:
+    paths:
+      - charts/**
   pull_request:
+    paths:
+      - charts/**
 
 jobs:
   lint-test:
