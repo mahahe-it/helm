@@ -11,7 +11,7 @@ on:
 
 jobs:
   lint-charts:
-    name: Skip Lint
+    name: Lint Charts
     runs-on: ubuntu-22.04
     steps:
       - name: "Skip"
