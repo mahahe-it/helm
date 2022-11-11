@@ -1,0 +1,25 @@
+name: Lint, Test and Deploy Charts
+on:
+  push:
+    paths-ignore:
+      - charts/**
+      - .github/workflows/**
+  pull_request:
+    paths-ignore:
+      - charts/**
+      - .github/workflows/**
+
+jobs:
+  lint-charts:
+    name: Skip Lint
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Skip"
+        run: 'echo "No Lint required."'
+
+  install-charts:
+    name: Install Charts
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Skip"
+        run: 'echo "No Install required."'
