@@ -8,9 +8,10 @@ Available Charts The Applications we offer at the moment are listed down here. W
 &lt;h4 id="available-charts">Available Charts&lt;/h4>
 &lt;p>The Applications we offer at the moment are listed down here. Watch this website often to discover new applications and new versions for them.&lt;/p>
 &lt;ul>
-&lt;li>&lt;code>Prometheus PVE Exporter@0.1.10&lt;/code>&lt;/li>
-&lt;li>&lt;code>Prometheus Haproxy Exporter@0.1.1&lt;/code>&lt;/li>
-&lt;li>&lt;code>YouTrack@0.1.3&lt;/code>&lt;/li>
+&lt;li>&lt;code>Prometheus PVE Exporter@0.1.14&lt;/code>&lt;/li>
+&lt;li>&lt;code>Prometheus Haproxy Exporter@0.1.3&lt;/code>&lt;/li>
+&lt;li>&lt;code>YouTrack@0.1.8&lt;/code>&lt;/li>
+&lt;li>&lt;code>FoundryVTT@0.1.1&lt;/code>&lt;/li>
 &lt;/ul>
 &lt;h4 id="license">License&lt;/h4>
 &lt;p>This website and every content used by it is licensed under the &lt;a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0&lt;/a>.&lt;/p></content></item></channel></rss>
