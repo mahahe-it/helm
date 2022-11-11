@@ -3,9 +3,11 @@ on:
   push:
     paths:
       - charts/**
+      - .github/workflows/**
   pull_request:
     paths:
       - charts/**
+      - .github/workflows/**
 
 jobs:
   lint-charts:
