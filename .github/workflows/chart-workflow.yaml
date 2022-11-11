@@ -3,13 +3,15 @@ on:
   push:
     paths:
       - charts/**
+      - .github/workflows/**
   pull_request:
     paths:
       - charts/**
+      - .github/workflows/**
 
 jobs:
-  lint-test:
-    name: "Lint and Test"
+  lint-charts:
+    name: Lint Charts
     runs-on: ubuntu-22.04
     steps:
       - name: "Checkout"
@@ -55,45 +57,98 @@ jobs:
         run: ct lint --config ct.yaml
         if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
 
+  install-charts:
+    name: Install Charts
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v2.4.2
+        with:
+          fetch-depth: 0
+
+      - name: "Set Up Helm"
+        uses: azure/setup-helm@v3.3
+        if: github.ref != 'refs/heads/main'
+        with:
+          version: v3.4.1
+
+      - name: "Set Up Python"
+        uses: actions/setup-python@v4.2.0
+        if: github.ref != 'refs/heads/main'
+        with:
+          python-version: 3.9
+
+      - name: "Set up chart-testing"
+        uses: helm/chart-testing-action@v2.3.0
+        if: github.ref != 'refs/heads/main'
+        with:
+          version: v3.3.0
+
+      - name: "Save Testing Values from Secret"
+        shell: bash
+        env:
+          SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
+        run: echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
+        if: github.ref != 'refs/heads/main'
+
+      - name: "Run chart-testing (list-changed)"
+        id: list-changed
+        if: github.ref != 'refs/heads/main'
+        run: |
+          changed=$(ct list-changed --config ct.yaml)
+          if [[ -n "$changed" ]]; then
+            echo "::set-output name=changed::true"
+          fi
+
       - name: Create kind cluster
         uses: helm/kind-action@v1.4.0
         if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
 
       - name: Run chart-testing (install)
-        run: ct install --config ct.yaml
+        run: ct install --config ct.yaml --debug
         if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
 
-      - name: Get Branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v6
-        if: github.ref != 'refs/heads/main'
-
-  release_on_nexus:
+  release-on-nexus:
     name: Release Chart on Nexus
     runs-on: ubuntu-22.04
-    needs: lint-test
+    needs:
+      - lint-charts
+      - install-charts
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
+          submodule: recursive
           fetch-depth: 0
 
       - name: Configure Git
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
-      - name: Install Helm
-        uses: azure/setup-helm@v1
-        with:
-          version: v3.4.0
-
       - name: Run chart-releaser
-        uses: ntwklr/nexus-helm-chart-releaser-action@v0.0.5
+        uses: helm/chart-releaser-action@v1.1.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
         with:
-          charts_repo_url: https://repo.mahahe.it/repository/helm/
-          username: "${{ secrets.NEXUS_USERNAME }}"
-          password: "${{ secrets.NEXUS_PASSWORD }}"
+          hugo-version: 'latest'
+
+      - name: Build Hugo
+        run: |
+          git submodule init
+          git submodule update
+          cd hugo
+          hugo --minify
+          cp -r ./public ../public
+          cd ..
+
+      - name: Deploy Hugo
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          cname: helm.mahahe.it
+          keep_files: true

@@ -24,8 +24,10 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       dnsPolicy: "ClusterFirst"
+      {{- if .Values.dnsConfig }}
       dnsConfig:
-        {{- toYaml .Values.dnsConfig | indent 6 }}
+        {{- toYaml .Values.dnsConfig | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:

@@ -1,7 +1,7 @@
 apiVersion: v2
 name: youtrack
 description: A Helm chart to install YouTrack in your Kubernetes Cluster
-version: 0.1.8
+version: 0.1.9
 appVersion: "2022.2"
 keywords:
 - youtrack

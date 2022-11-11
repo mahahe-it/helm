@@ -14,9 +14,10 @@ Welcome to the Official MaHaHe Helm Repository! Here you will find various appli
 
 The Applications we offer at the moment are listed down here. Watch this website often to discover new applications and new versions for them.
 
- - ```Prometheus PVE Exporter@0.1.10```
- - ```Prometheus Haproxy Exporter@0.1.1```
- - ```YouTrack@0.1.3```
+ - ```Prometheus PVE Exporter@0.1.14```
+ - ```Prometheus Haproxy Exporter@0.1.3```
+ - ```YouTrack@0.1.8```
+ - ```FoundryVTT@0.1.1```
 
 #### License
 

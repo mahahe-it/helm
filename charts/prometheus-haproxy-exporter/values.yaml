@@ -7,7 +7,7 @@
 ## @param rbac.pspEnabled Specifies whether a PodSecurityPolicy should be created
 rbac:
   create: true
-  pspEnabled: true
+  pspEnabled: false
 
 ## @section serviceAccount
 ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
