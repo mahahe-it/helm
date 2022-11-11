@@ -1,6 +1,63 @@
 apiVersion: v1
 entries:
+  foundry-vtt:
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/mahahe-it/helm
+    apiVersion: v2
+    appVersion: v10.288
+    created: "2022-11-11T16:57:39.945057189Z"
+    description: Foundry Virtual Tabletop
+    digest: a42e3229267434435ab17ffccaead034603a94756a01514b4f7f554ec4beb207
+    icon: https://foundryvtt.com/static/assets/icons/fvtt.png
+    keywords:
+    - game
+    - server
+    - vtt
+    - virtualtabletop
+    - foundryvtt
+    - foundry
+    maintainers:
+    - email: devops@mahahe.it
+      name: MaHaHe DevOps
+      url: https://www.mahahe.it/
+    name: foundry-vtt
+    sources:
+    - https://github.com/mahahe-it/helm/tree/main/charts/foundry-vtt
+    type: application
+    urls:
+    - https://github.com/mahahe-it/helm/releases/download/foundry-vtt-0.1.2/foundry-vtt-0.1.2.tgz
+    version: 0.1.2
   prometheus-haproxy-exporter:
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/mahahe-it/helm
+        - name: Upstream Project
+          url: https://github.com/prometheus/haproxy_exporter
+    apiVersion: v2
+    appVersion: v0.13.0
+    created: "2022-11-11T16:57:40.071104307Z"
+    description: A Helm chart to export the metrics from haproxy in Prometheus format.
+    digest: 426d35bd4a01604c76d1f0705ba0be0461cf59d44293aaa6be6896a89a86b725
+    home: https://github.com/prometheus/haproxy_exporter
+    keywords:
+    - haproxy-exporter
+    - prometheus
+    - haproxy
+    maintainers:
+    - email: matteob99@mahahe.it
+      name: MatteoB99
+    - email: haloghen@mahahe.it
+      name: Haloghen
+    name: prometheus-haproxy-exporter
+    sources:
+    - https://github.com/prometheus/haproxy_exporter
+    - https://github.com/mahahe-it/helm/tree/master/charts/
+    urls:
+    - https://github.com/mahahe-it/helm/releases/download/prometheus-haproxy-exporter-0.1.4/prometheus-haproxy-exporter-0.1.4.tgz
+    version: 0.1.4
   - annotations:
       artifacthub.io/links: |
         - name: Chart Source
@@ -38,6 +95,32 @@ entries:
           url: https://github.com/prometheus-pve/prometheus-pve-exporter
     apiVersion: v2
     appVersion: 2.2.3
+    created: "2022-11-11T16:57:40.227320118Z"
+    description: A Helm chart to export the metrics from pve in Prometheus format.
+    digest: 66ca4b260a09d342df79199874a829d48caf601f4b51ffbabaf3afba113b6990
+    home: https://github.com/prometheus-pve/prometheus-pve-exporter
+    keywords:
+    - pve-exporter
+    maintainers:
+    - email: matteob99@mahahe.it
+      name: MatteoB99
+    - email: haloghen@mahahe.it
+      name: Haloghen
+    name: prometheus-pve-exporter
+    sources:
+    - https://github.com/prometheus-pve/prometheus-pve-exporter
+    - https://github.com/mahahe-it/helm/tree/master/charts/
+    urls:
+    - https://github.com/mahahe-it/helm/releases/download/prometheus-pve-exporter-0.1.15/prometheus-pve-exporter-0.1.15.tgz
+    version: 0.1.15
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/mahahe-it/helm
+        - name: Upstream Project
+          url: https://github.com/prometheus-pve/prometheus-pve-exporter
+    apiVersion: v2
+    appVersion: 2.2.3
     created: "2022-09-30T15:57:29.308931338Z"
     description: A Helm chart to export the metrics from pve in Prometheus format.
     digest: 8871f92a62cff2a5dc4ed68e6b6904172bf137469884b9d5fe28fbe447c7a9aa
@@ -57,6 +140,30 @@ entries:
     - https://github.com/mahahe-it/helm/releases/download/prometheus-pve-exporter-0.1.14/prometheus-pve-exporter-0.1.14.tgz
     version: 0.1.14
   youtrack:
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/mahahe-it/helm
+    apiVersion: v2
+    appVersion: "2022.2"
+    created: "2022-11-11T16:57:40.38357323Z"
+    description: A Helm chart to install YouTrack in your Kubernetes Cluster
+    digest: 81a526add51735d80c410118f5fa7b86f0a538fd2f836f5db531a87064a0da64
+    home: https://www.jetbrains.com/youtrack/
+    keywords:
+    - youtrack
+    - jetbrains
+    maintainers:
+    - email: matteob99@mahahe.it
+      name: MatteoB99
+    - email: haloghen@mahahe.it
+      name: Haloghen
+    name: youtrack
+    sources:
+    - https://github.com/mahahe-it/helm/tree/master/charts/
+    urls:
+    - https://github.com/mahahe-it/helm/releases/download/youtrack-0.1.9/youtrack-0.1.9.tgz
+    version: 0.1.9
   - annotations:
       artifacthub.io/links: |
         - name: Chart Source
