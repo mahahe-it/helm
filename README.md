@@ -33,3 +33,10 @@ This repository is licensed under the [Apache License 2.0](https://github.com/ma
 
 ### Maintainers
 This repository is maintained by the MaHaHe DevOps Team. You can contact us at [devops@mahahe.it](mailto:devops@mahahe.it).
+
+### Contribution
+If contributing from Windows, please run this command before pushing:
+```shell
+git config --global core.autocrlf false
+```
+Every file with `CRLF` as newlines will be rejected.
