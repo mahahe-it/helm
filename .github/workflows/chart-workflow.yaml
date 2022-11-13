@@ -37,12 +37,7 @@ jobs:
         with:
           version: v3.3.0
 
-      - name: "Save Testing Values from Secret"
-        shell: bash
-        env:
-          SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
-        run: echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
-        if: github.ref != 'refs/heads/main'
+
 
       - name: "Run chart-testing (list-changed)"
         id: list-changed
@@ -50,9 +45,16 @@ jobs:
         run: |
           changed=$(ct list-changed --config .github/ct/ct.yaml)
           if [[ -n "$changed" ]]; then
-            echo "::set-output name=changed::true"
-            echo "::set-output name=changed-list::$changed"
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "changed-list=$changed" >> $GITHUB_OUTPUT
           fi
+      - name: "Save Testing Values from Secret"
+        shell: bash
+        env:
+          SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
+        run: echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
+        if: github.ref != 'refs/heads/main' and   contains(steps.list-changed.outputs.changed-list, "charts/foundry-vtt"
+
       - name: "debug"
         run: echo "${{ steps.list-changed.outputs.changed-list }}" && exit 1
 
