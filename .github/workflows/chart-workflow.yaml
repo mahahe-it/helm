@@ -37,8 +37,6 @@ jobs:
         with:
           version: v3.3.0
 
-
-
       - name: "Run chart-testing (list-changed)"
         id: list-changed
         if: github.ref != 'refs/heads/main'
@@ -48,15 +46,13 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "changed-list=$changed" >> $GITHUB_OUTPUT
           fi
+
       - name: "Save Testing Values from Secret"
         shell: bash
         env:
           SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
         run: echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
         if: github.ref != 'refs/heads/main' && contains(steps.list-changed.outputs.changed-list, 'charts/foundry-vtt')
-
-      - name: "debug"
-        run: echo "${{ steps.list-changed.outputs.changed-list }}" && exit 1
 
       - name: "Run chart-testing (lint)"
         run: ct lint --config .github/ct/ct.yaml --lint-conf .github/ct/lintconf.yaml --chart-yaml-schema .github/ct/chart_schema.yaml
@@ -89,21 +85,22 @@ jobs:
         with:
           version: v3.3.0
 
+      - name: "Run chart-testing (list-changed)"
+        id: list-changed
+        if: github.ref != 'refs/heads/main'
+        run: |
+          changed=$(ct list-changed --config .github/ct/ct.yaml)
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "changed-list=$changed" >> $GITHUB_OUTPUT
+          fi
+
       - name: "Save Testing Values from Secret"
         shell: bash
         env:
           SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
         run: echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
-        if: github.ref != 'refs/heads/main'
-
-      - name: "Run chart-testing (list-changed)"
-        id: list-changed
-        if: github.ref != 'refs/heads/main'
-        run: |
-          changed=$(ct list-changed --config ct.yaml)
-          if [[ -n "$changed" ]]; then
-            echo "::set-output name=changed::true"
-          fi
+        if: github.ref != 'refs/heads/main' && contains(steps.list-changed.outputs.changed-list, 'charts/foundry-vtt')
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.4.0
@@ -113,7 +110,7 @@ jobs:
         run: ct install --config .github/ct/ct.yaml --lint-conf .github/ct/lintconf.yaml --chart-yaml-schema .github/ct/chart_schema.yaml --debug
         if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
 
-  release-on-nexus:
+  release-on-github-pages:
     name: Release Chart on GitHub Pages
     runs-on: ubuntu-22.04
     needs:
