@@ -15,7 +15,7 @@ rbac:
 #  # If not set and create is true, a name is generated using the fullname template
 
 serviceAccount:
-  create: false
+  create: true
   name:
 
 ## @param replicaCount Desired number of scaper pods
