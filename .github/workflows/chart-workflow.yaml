@@ -53,7 +53,7 @@ jobs:
         env:
           SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
         run: echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
-        if: github.ref != 'refs/heads/main' and   contains(steps.list-changed.outputs.changed-list, "charts/foundry-vtt")
+        if: github.ref != 'refs/heads/main' && contains(steps.list-changed.outputs.changed-list, "charts/foundry-vtt")
 
       - name: "debug"
         run: echo "${{ steps.list-changed.outputs.changed-list }}" && exit 1
