@@ -213,6 +213,7 @@ spec:
             secretName: {{ include "foundry-vtt.fullname" . }}-aws
           {{- else }}
             secretName: {{ .Values.foundryvtt.s3.existingSecret }}
+          {{- end }}
     {{- end }}
         - name: data
     {{- if .Values.persistence.enabled }}
@@ -225,4 +226,3 @@ spec:
     {{- else }}
           emptyDir: { }
     {{- end }}
-  {{- end }}
