@@ -7,6 +7,34 @@ entries:
           url: https://github.com/mahahe-it/helm
     apiVersion: v2
     appVersion: v10.288
+    created: "2024-06-21T13:02:19.724555637Z"
+    description: Foundry Virtual Tabletop
+    digest: 90dc5c55ffa05f4e11a095014958bdc3afd17804cc3de9c299f8742c5fc50577
+    icon: https://foundryvtt.com/static/assets/icons/fvtt.png
+    keywords:
+    - game
+    - server
+    - vtt
+    - virtualtabletop
+    - foundryvtt
+    - foundry
+    maintainers:
+    - email: devops@mahahe.it
+      name: MaHaHe DevOps
+      url: https://www.mahahe.it/
+    name: foundry-vtt
+    sources:
+    - https://github.com/mahahe-it/helm/tree/main/charts/foundry-vtt
+    type: application
+    urls:
+    - https://github.com/mahahe-it/helm/releases/download/foundry-vtt-0.1.3/foundry-vtt-0.1.3.tgz
+    version: 0.1.3
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/mahahe-it/helm
+    apiVersion: v2
+    appVersion: v10.288
     created: "2022-11-11T16:57:39.945057189Z"
     description: Foundry Virtual Tabletop
     digest: a42e3229267434435ab17ffccaead034603a94756a01514b4f7f554ec4beb207
