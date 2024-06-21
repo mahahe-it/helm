@@ -28,10 +28,10 @@ spec:
           {{- end}}
           args:
           {{- if .Values.haproxy.scrapeUri }}
-            - --haproxy.scrape-uri={{ .Values.haproxy.scrapeUri }}
+          - --haproxy.scrape-uri={{ .Values.haproxy.scrapeUri }}
           {{- end }}
           {{- if eq  .Values.haproxy.verify_ssl false}}
-            - --no-haproxy.ssl-verify
+          - --no-haproxy.ssl-verify
           {{- end}}
           {{- range .Values.haproxy.ExtraArgs }}
           - {{ . }}
