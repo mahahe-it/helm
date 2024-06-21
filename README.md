@@ -25,7 +25,7 @@ The Applications we offer at the moment are listed down here. Watch this website
  - `Prometheus PVE Exporter@0.1.15`
  - `Prometheus Haproxy Exporter@0.1.5`
  - `YouTrack@0.1.9`
- - `FoundryVTT@0.1.3`
+ - `FoundryVTT@0.1.4`
 
 ### License
 
