@@ -255,6 +255,7 @@ container:
 ## @param ingress.pathType Type of Path
 ## @param ingress.tls Enable or Disable TLS
 ## @param ingress.configurationSnippet Extra NGINX Configuration to add as Annotation
+## @param ingress.className Optional Ingress class name
 ingress:
   enabled: false
   hostname: foundry.domain.com
@@ -267,3 +268,4 @@ ingress:
   # configurationSnippet: |
   #   more_set_input_headers "X-Forwarded-Host: {{ .Values.foundryvtt.hostname }}";
   tls: false
+  className: ""
