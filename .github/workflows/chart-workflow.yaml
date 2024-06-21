@@ -107,7 +107,7 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
 
       - name: Run chart-testing (install)
-        run: ct install --config .github/ct/ct.yaml --lint-conf .github/ct/lintconf.yaml --chart-yaml-schema .github/ct/chart_schema.yaml --debug
+        run: ct install --config .github/ct/ct.yaml --debug
         if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
 
   release-on-github-pages:
