@@ -152,7 +152,7 @@ jobs:
             exit 0
           fi
 
-          for chart in $changed_dirs; do[ -d "$chart" ] || continue
+          for chart in $changed_dirs; do [ -d "$chart" ] || continue
             echo "==> Processing $chart"
             CHART_NAME=$(basename "$chart")
             
