@@ -139,12 +139,11 @@ jobs:
       - name: Process & Dual-Release Changed Charts
         id: release
         run: |
-          # 1. Fetch old index.yaml gracefully
           mkdir -p public
           git fetch origin gh-pages
           git show origin/gh-pages:index.yaml > public/index.yaml || echo -e "apiVersion: v1\nentries: {}" > public/index.yaml
 
-          # 2. Detect changed charts in the latest push
+          # Detect changed charts
           changed_dirs=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep "^charts/" | cut -d '/' -f 1,2 | sort -u || true)
           
           if [[ -z "$changed_dirs" ]]; then
@@ -152,42 +151,30 @@ jobs:
             exit 0
           fi
 
-          for chart in $changed_dirs; do [ -d "$chart" ] || continue
+          for chart in $changed_dirs; do[ -d "$chart" ] || continue
             echo "==> Processing $chart"
             CHART_NAME=$(basename "$chart")
             
-            # Bump minor version
+            # Read the version already bumped by the developer in the PR
             CURRENT_VERSION=$(yq '.version' "$chart/Chart.yaml")
-            IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
-            NEW_VERSION="${major}.$((minor + 1)).0"
-            yq -i ".version = \"${NEW_VERSION}\"" "$chart/Chart.yaml"
-            echo "Bumped $CHART_NAME from $CURRENT_VERSION to $NEW_VERSION"
+            echo "Publishing $CHART_NAME v$CURRENT_VERSION"
 
-            # Package and Push to OCI
+            # 1. Package and Push pristine version to OCI
             helm package "$chart" -d /tmp/oci
-            helm push "/tmp/oci/${CHART_NAME}-${NEW_VERSION}.tgz" "oci://ghcr.io/${{ github.repository_owner }}/helm"
+            helm push "/tmp/oci/${CHART_NAME}-${CURRENT_VERSION}.tgz" "oci://ghcr.io/${{ github.repository_owner }}/helm"
 
-            # Mutate to Deprecated for HTTPS
+            # 2. Mutate to Deprecated for HTTPS
             yq -i '.deprecated = true | .description += "[DEPRECATED: Please migrate to OCI registry -> oci://ghcr.io/${{ github.repository_owner }}/helm]"' "$chart/Chart.yaml"
             
-            # Package for HTTPS
+            # 3. Package deprecated version for HTTPS
             helm package "$chart" -d ./public
 
-            # Revert mutation in workspace (keep only the clean version bump)
+            # 4. Revert mutation in workspace (Leaves git completely clean!)
             git checkout -- "$chart/Chart.yaml"
-            yq -i ".version = \"${NEW_VERSION}\"" "$chart/Chart.yaml"
-            git add "$chart/Chart.yaml"
           done
 
-          # 3. Update HTTPS index.yaml
+          # Update HTTPS index.yaml
           helm repo index ./public --url https://helm.mahahe.it --merge ./public/index.yaml
-
-          # 4. Commit pure version bumps to main
-          if ! git diff --cached --quiet; then
-            # Using [skip ci] prevents triggering an infinite loop of workflows
-            git commit -m "chore(release): bump chart versions [skip ci]"
-            git push origin main
-          fi
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
