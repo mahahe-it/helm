@@ -7,6 +7,36 @@ entries:
           url: https://github.com/mahahe-it/helm
     apiVersion: v2
     appVersion: v10.288
+    created: "2026-04-20T08:15:31.951645868Z"
+    deprecated: true
+    description: 'Foundry Virtual Tabletop[DEPRECATED: Please migrate to OCI registry
+      -> oci://ghcr.io/mahahe-it/helm]'
+    digest: f619c29823f0d8be3d5a339643299454b6a52b7392b3f9cb7a1a10fb2e6930dd
+    icon: https://foundryvtt.com/static/assets/icons/fvtt.png
+    keywords:
+    - game
+    - server
+    - vtt
+    - virtualtabletop
+    - foundryvtt
+    - foundry
+    maintainers:
+    - email: devops@mahahe.it
+      name: MaHaHe DevOps
+      url: https://www.mahahe.it/
+    name: foundry-vtt
+    sources:
+    - https://github.com/mahahe-it/helm/tree/main/charts/foundry-vtt
+    type: application
+    urls:
+    - https://helm.mahahe.it/foundry-vtt-0.1.7.tgz
+    version: 0.1.7
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/mahahe-it/helm
+    apiVersion: v2
+    appVersion: v10.288
     created: "2024-06-21T13:06:00.95696462Z"
     description: Foundry Virtual Tabletop
     digest: 316cd6286f8bb8803633bfa5b7188c2a28bf5db3977dc5aedb8380ebb41e2d66
@@ -86,6 +116,36 @@ entries:
     - https://github.com/mahahe-it/helm/releases/download/foundry-vtt-0.1.2/foundry-vtt-0.1.2.tgz
     version: 0.1.2
   prometheus-haproxy-exporter:
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/mahahe-it/helm
+        - name: Upstream Project
+          url: https://github.com/prometheus/haproxy_exporter
+    apiVersion: v2
+    appVersion: v0.13.0
+    created: "2026-04-20T08:15:31.952212308Z"
+    deprecated: true
+    description: 'A Helm chart to export the metrics from haproxy in Prometheus format.[DEPRECATED:
+      Please migrate to OCI registry -> oci://ghcr.io/mahahe-it/helm]'
+    digest: 2ee9f86db869585250ba3e15314bb4d523e80adc66c10f0a0ca385b2bf8605e5
+    home: https://github.com/prometheus/haproxy_exporter
+    keywords:
+    - haproxy-exporter
+    - prometheus
+    - haproxy
+    maintainers:
+    - email: matteob99@mahahe.it
+      name: MatteoB99
+    - email: haloghen@mahahe.it
+      name: Haloghen
+    name: prometheus-haproxy-exporter
+    sources:
+    - https://github.com/prometheus/haproxy_exporter
+    - https://github.com/mahahe-it/helm/tree/master/charts/
+    urls:
+    - https://helm.mahahe.it/prometheus-haproxy-exporter-0.1.8.tgz
+    version: 0.1.8
   - annotations:
       artifacthub.io/links: |
         - name: Chart Source
@@ -179,6 +239,34 @@ entries:
           url: https://github.com/prometheus-pve/prometheus-pve-exporter
     apiVersion: v2
     appVersion: 2.2.3
+    created: "2026-04-20T08:15:31.953679997Z"
+    deprecated: true
+    description: 'A Helm chart to export the metrics from pve in Prometheus format.[DEPRECATED:
+      Please migrate to OCI registry -> oci://ghcr.io/mahahe-it/helm]'
+    digest: 5c0f8bdbd13a2ad43bbe64c72b66e03a9a18a4543351eaced444e48deb7d37d8
+    home: https://github.com/prometheus-pve/prometheus-pve-exporter
+    keywords:
+    - pve-exporter
+    maintainers:
+    - email: matteob99@mahahe.it
+      name: MatteoB99
+    - email: haloghen@mahahe.it
+      name: Haloghen
+    name: prometheus-pve-exporter
+    sources:
+    - https://github.com/prometheus-pve/prometheus-pve-exporter
+    - https://github.com/mahahe-it/helm/tree/master/charts/
+    urls:
+    - https://helm.mahahe.it/prometheus-pve-exporter-0.1.18.tgz
+    version: 0.1.18
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/mahahe-it/helm
+        - name: Upstream Project
+          url: https://github.com/prometheus-pve/prometheus-pve-exporter
+    apiVersion: v2
+    appVersion: 2.2.3
     created: "2022-11-11T16:57:40.227320118Z"
     description: A Helm chart to export the metrics from pve in Prometheus format.
     digest: 66ca4b260a09d342df79199874a829d48caf601f4b51ffbabaf3afba113b6990
@@ -230,6 +318,32 @@ entries:
           url: https://github.com/mahahe-it/helm
     apiVersion: v2
     appVersion: "2022.2"
+    created: "2026-04-20T08:15:31.954219265Z"
+    deprecated: true
+    description: 'A Helm chart to install YouTrack in your Kubernetes Cluster[DEPRECATED:
+      Please migrate to OCI registry -> oci://ghcr.io/mahahe-it/helm]'
+    digest: d19b26d6b4b7a0b414455e42ff2bc66c666b3aedd4c8c0774acf7e32f9b06610
+    home: https://www.jetbrains.com/youtrack/
+    keywords:
+    - youtrack
+    - jetbrains
+    maintainers:
+    - email: matteob99@mahahe.it
+      name: MatteoB99
+    - email: haloghen@mahahe.it
+      name: Haloghen
+    name: youtrack
+    sources:
+    - https://github.com/mahahe-it/helm/tree/master/charts/
+    urls:
+    - https://helm.mahahe.it/youtrack-0.1.12.tgz
+    version: 0.1.12
+  - annotations:
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/mahahe-it/helm
+    apiVersion: v2
+    appVersion: "2022.2"
     created: "2022-11-11T16:57:40.38357323Z"
     description: A Helm chart to install YouTrack in your Kubernetes Cluster
     digest: 81a526add51735d80c410118f5fa7b86f0a538fd2f836f5db531a87064a0da64
@@ -272,4 +386,4 @@ entries:
     urls:
     - https://github.com/mahahe-it/helm/releases/download/youtrack-0.1.8/youtrack-0.1.8.tgz
     version: 0.1.8
-generated: "2022-09-30T15:57:28.967825055Z"
+generated: "2026-04-20T08:15:31.95060391Z"
