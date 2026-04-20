@@ -113,7 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
-      contents: write   # To push version bumps to main & deploy gh-pages
+      contents: read
       packages: write   # To push to GHCR OCI
     steps:
       - name: Checkout
@@ -136,13 +136,8 @@ jobs:
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Process & Dual-Release Changed Charts
-        id: release
+      - name: Package & Push Changed Charts to OCI
         run: |
-          mkdir -p public
-          git fetch origin gh-pages
-          git show origin/gh-pages:index.yaml > public/index.yaml || echo -e "apiVersion: v1\nentries: {}" > public/index.yaml
-
           # Detect changed charts
           changed_dirs=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep "^charts/" | cut -d '/' -f 1,2 | sort -u || true)
           
@@ -151,47 +146,16 @@ jobs:
             exit 0
           fi
 
-          for chart in $changed_dirs; do [ -d "$chart" ] || continue
+          for chart in $changed_dirs; do
+            [ -d "$chart" ] || continue
             echo "==> Processing $chart"
             CHART_NAME=$(basename "$chart")
             
             # Read the version already bumped by the developer in the PR
             CURRENT_VERSION=$(yq '.version' "$chart/Chart.yaml")
-            echo "Publishing $CHART_NAME v$CURRENT_VERSION"
+            echo "Publishing $CHART_NAME v$CURRENT_VERSION to OCI"
 
-            # 1. Package and Push pristine version to OCI
+            # Package and Push to OCI natively
             helm package "$chart" -d /tmp/oci
             helm push "/tmp/oci/${CHART_NAME}-${CURRENT_VERSION}.tgz" "oci://ghcr.io/${{ github.repository_owner }}/helm"
-
-            # 2. Mutate to Deprecated for HTTPS
-            yq -i '.deprecated = true | .description += "[DEPRECATED: Please migrate to OCI registry -> oci://ghcr.io/${{ github.repository_owner }}/helm]"' "$chart/Chart.yaml"
-            
-            # 3. Package deprecated version for HTTPS
-            helm package "$chart" -d ./public
-
-            # 4. Revert mutation in workspace (Leaves git completely clean!)
-            git checkout -- "$chart/Chart.yaml"
           done
-
-          # Update HTTPS index.yaml
-          helm repo index ./public --url https://helm.mahahe.it --merge ./public/index.yaml
-
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
-        with:
-          hugo-version: '0.120.0'
-
-      - name: Build Hugo site
-        run: |
-          cd hugo
-          hugo --minify
-          # Copy compiled site into our public dir (which already holds .tgz and index.yaml)
-          cp -R ./public/* ../public/
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
-          cname: helm.mahahe.it
-          keep_files: true
