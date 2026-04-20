@@ -1,6 +1,8 @@
 name: Lint, Test and Deploy Charts
 on:
   push:
+    branches:
+      - main
     paths:
       - charts/**
       - .github/workflows/**
@@ -9,37 +11,38 @@ on:
       - charts/**
       - .github/workflows/**
 
+# Enforce least-privilege permissions globally
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   lint-charts:
     name: Lint Charts
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request_target'
     steps:
-      - name: "Checkout"
-        uses: actions/checkout@v2.4.2
+      - name: "Checkout PR Code"
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: "Set Up Helm"
-        uses: azure/setup-helm@v3.3
-        if: github.ref != 'refs/heads/main'
+        uses: azure/setup-helm@v5.0.0
         with:
-          version: v3.4.1
+          version: v3.19.5
 
       - name: "Set Up Python"
-        uses: actions/setup-python@v4.2.0
-        if: github.ref != 'refs/heads/main'
+        uses: actions/setup-python@v6
         with:
-          python-version: 3.9
+          python-version: "3.13"
 
       - name: "Set up chart-testing"
-        uses: helm/chart-testing-action@v2.3.0
-        if: github.ref != 'refs/heads/main'
-        with:
-          version: v3.3.0
+        uses: helm/chart-testing-action@v2.8.0
 
       - name: "Run chart-testing (list-changed)"
         id: list-changed
-        if: github.ref != 'refs/heads/main'
         run: |
           changed=$(ct list-changed --config .github/ct/ct.yaml)
           if [[ -n "$changed" ]]; then
@@ -48,46 +51,42 @@ jobs:
           fi
 
       - name: "Save Testing Values from Secret"
-        shell: bash
+        if: contains(steps.list-changed.outputs.changed-list, 'charts/foundry-vtt')
         env:
           SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
         run: echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
-        if: github.ref != 'refs/heads/main' && contains(steps.list-changed.outputs.changed-list, 'charts/foundry-vtt')
 
       - name: "Run chart-testing (lint)"
+        if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --config .github/ct/ct.yaml --lint-conf .github/ct/lintconf.yaml --chart-yaml-schema .github/ct/chart_schema.yaml
-        if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
 
   install-charts:
     name: Install Charts
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    needs: lint-charts
+    if: github.event_name == 'pull_request_target'
     steps:
-      - name: "Checkout"
-        uses: actions/checkout@v2.4.2
+      - name: "Checkout PR Code"
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: "Set Up Helm"
-        uses: azure/setup-helm@v3.3
-        if: github.ref != 'refs/heads/main'
+        uses: azure/setup-helm@v5.0.0
         with:
-          version: v3.4.1
+          version: v3.19.5
 
       - name: "Set Up Python"
-        uses: actions/setup-python@v4.2.0
-        if: github.ref != 'refs/heads/main'
+        uses: actions/setup-python@v6
         with:
-          python-version: 3.9
+          python-version: "3.13"
 
       - name: "Set up chart-testing"
-        uses: helm/chart-testing-action@v2.3.0
-        if: github.ref != 'refs/heads/main'
-        with:
-          version: v3.3.0
+        uses: helm/chart-testing-action@v2.8.0
 
       - name: "Run chart-testing (list-changed)"
         id: list-changed
-        if: github.ref != 'refs/heads/main'
         run: |
           changed=$(ct list-changed --config .github/ct/ct.yaml)
           if [[ -n "$changed" ]]; then
@@ -96,59 +95,114 @@ jobs:
           fi
 
       - name: "Save Testing Values from Secret"
-        shell: bash
+        if: contains(steps.list-changed.outputs.changed-list, 'charts/foundry-vtt')
         env:
           SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
         run: echo "$SECRET_VALUES" | base64 -d > ./charts/foundry-vtt/ci/test-values.yaml
-        if: github.ref != 'refs/heads/main' && contains(steps.list-changed.outputs.changed-list, 'charts/foundry-vtt')
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.4.0
-        if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
+        if: steps.list-changed.outputs.changed == 'true'
+        uses: helm/kind-action@v1.14.0
 
       - name: Run chart-testing (install)
+        if: steps.list-changed.outputs.changed == 'true'
         run: ct install --config .github/ct/ct.yaml --debug
-        if: steps.list-changed.outputs.changed == 'true' && github.ref != 'refs/heads/main'
 
-  release-on-github-pages:
-    name: Release Chart on GitHub Pages
-    runs-on: ubuntu-22.04
-    needs:
-      - lint-charts
-      - install-charts
-    if: github.ref == 'refs/heads/main'
+  release-charts:
+    name: Dual Release (OCI + HTTPS)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write   # To push version bumps to main & deploy gh-pages
+      packages: write   # To push to GHCR OCI
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
-          submodule: recursive
+          submodules: recursive
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Git
         run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-      - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.1.0
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v5.0.0
+        with:
+          version: v3.19.5
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Process & Dual-Release Changed Charts
+        id: release
+        run: |
+          # 1. Fetch old index.yaml gracefully
+          mkdir -p public
+          git fetch origin gh-pages
+          git show origin/gh-pages:index.yaml > public/index.yaml || echo -e "apiVersion: v1\nentries: {}" > public/index.yaml
+
+          # 2. Detect changed charts in the latest push
+          changed_dirs=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep "^charts/" | cut -d '/' -f 1,2 | sort -u || true)
+          
+          if [[ -z "$changed_dirs" ]]; then
+            echo "No chart directories changed."
+            exit 0
+          fi
+
+          for chart in $changed_dirs; do[ -d "$chart" ] || continue
+            echo "==> Processing $chart"
+            CHART_NAME=$(basename "$chart")
+            
+            # Bump minor version
+            CURRENT_VERSION=$(yq '.version' "$chart/Chart.yaml")
+            IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+            NEW_VERSION="${major}.$((minor + 1)).0"
+            yq -i ".version = \"${NEW_VERSION}\"" "$chart/Chart.yaml"
+            echo "Bumped $CHART_NAME from $CURRENT_VERSION to $NEW_VERSION"
+
+            # Package and Push to OCI
+            helm package "$chart" -d /tmp/oci
+            helm push "/tmp/oci/${CHART_NAME}-${NEW_VERSION}.tgz" "oci://ghcr.io/${{ github.repository_owner }}/helm"
+
+            # Mutate to Deprecated for HTTPS
+            yq -i '.deprecated = true | .description += "[DEPRECATED: Please migrate to OCI registry -> oci://ghcr.io/${{ github.repository_owner }}/helm]"' "$chart/Chart.yaml"
+            
+            # Package for HTTPS
+            helm package "$chart" -d ./public
+
+            # Revert mutation in workspace (keep only the clean version bump)
+            git checkout -- "$chart/Chart.yaml"
+            yq -i ".version = \"${NEW_VERSION}\"" "$chart/Chart.yaml"
+            git add "$chart/Chart.yaml"
+          done
+
+          # 3. Update HTTPS index.yaml
+          helm repo index ./public --url https://helm.mahahe.it --merge ./public/index.yaml
+
+          # 4. Commit pure version bumps to main
+          if ! git diff --cached --quiet; then
+            # Using [skip ci] prevents triggering an infinite loop of workflows
+            git commit -m "chore(release): bump chart versions [skip ci]"
+            git push origin main
+          fi
 
       - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
+        uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: 'latest'
 
-      - name: Build Hugo
+      - name: Build Hugo site
         run: |
-          git submodule init
-          git submodule update
           cd hugo
           hugo --minify
-          cp -r ./public ../public
-          cd ..
+          # Copy compiled site into our public dir (which already holds .tgz and index.yaml)
+          cp -R ./public/* ../public/
 
-      - name: Deploy Hugo
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
