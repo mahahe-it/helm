@@ -1,3 +1,6 @@
+# Deprecation Notice
+This chart, along with all others, is in the process of being ported to **OCI**. All HTTPS releases using the old `https://helm.mahahe.it/` are to be considered deprecated.
+
 # YouTrack by MaHaHe
 
 YouTrack is a project management tool that can be adapted to your processes to help you deliver great products.

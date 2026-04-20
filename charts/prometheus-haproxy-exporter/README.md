@@ -1,3 +1,6 @@
+# Deprecation Notice
+This chart, along with all others, is in the process of being ported to **OCI**. All HTTPS releases using the old `https://helm.mahahe.it/` are to be considered deprecated.
+
 # prometheus-haproxy-exporter
 
 ## TL;DR;
