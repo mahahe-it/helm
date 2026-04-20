@@ -12,14 +12,14 @@ on:
 jobs:
   lint-charts:
     name: Lint Charts
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: "Skip"
-        run: 'echo "No Lint required."'
+        run: echo "No Lint required."
 
   install-charts:
     name: Install Charts
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: "Skip"
-        run: 'echo "No Install required."'
+        run: echo "No Install required."
