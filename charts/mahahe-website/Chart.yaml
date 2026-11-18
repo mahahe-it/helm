@@ -1,8 +1,9 @@
 apiVersion: v2
 name: mahahe-website
-description: The MaHaHe website (www.mahahe.it and helm.mahahe.it), a static Hugo site served by nginx
+description: The MaHaHe website (www.mahahe.it and helm.mahahe.it), a static
+  Hugo site served by nginx
 type: application
-version: 0.0.0
+version: 1.0.0
 # renovate: datasource=docker depName=ghcr.io/mahahe-it/mahahe-website
 appVersion: "1.0.0"
 keywords:

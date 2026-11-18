@@ -1,6 +1,6 @@
 {
   "charts/foundry-vtt": "1.0.2",
-  "charts/mahahe-website": "0.0.0",
+  "charts/mahahe-website": "1.0.0",
   "charts/prometheus-haproxy-exporter": "1.0.1",
   "charts/prometheus-pve-exporter": "1.0.1",
   "charts/youtrack": "1.0.0"
