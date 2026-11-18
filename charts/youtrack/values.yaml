@@ -165,7 +165,6 @@ ingress:
   extraRules: []
 
 
-
 resources:
   # -- The resources limits for the YouTrack server containers
   # @section -- Advanced Parameters
