@@ -1,0 +1,29 @@
+name: Feature request
+description: A new option for a chart, or a new chart
+labels: ["Enhancement"]
+body:
+  - type: dropdown
+    id: chart
+    attributes:
+      label: Chart
+      # Keep in step with charts/
+      options:
+        - foundry-vtt
+        - prometheus-haproxy-exporter
+        - prometheus-pve-exporter
+        - youtrack
+        - New chart
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What do you need
+      description: The use case, and what the chart does not let you do today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: For example the values you would like to set. Pull requests are welcome too, see CONTRIBUTING.md.
