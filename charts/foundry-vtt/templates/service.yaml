@@ -6,7 +6,7 @@ metadata:
     app: {{ template "foundry-vtt.fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
-    heritage: "{{ .Release.Service }}"    
+    heritage: "{{ .Release.Service }}"
     {{- include "foundry-vtt.labels" . | nindent 4 }}
     {{- range $key, $value := .Values.service.labels }}
     {{ $key }}: {{ $value | quote }}
