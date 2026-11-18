@@ -17,8 +17,9 @@ metadata:
   {{- toYaml .Values.ingress.annotations | nindent 4 }}
 {{- end }}
 spec:
-{{- if .Values.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.ingress.ingressClassName }}
+{{- /* className is the documented value; ingressClassName was read before 1.0.2 */}}
+{{- with .Values.ingress.className | default .Values.ingress.ingressClassName }}
+  ingressClassName: {{ . }}
 {{- end }}
   rules:
     - host: {{ .Values.ingress.hostname }}

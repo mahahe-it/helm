@@ -48,3 +48,28 @@ tests:
       - contains:
           path: spec.tls[0].hosts
           content: vtt.example.com
+
+  - it: sets the ingress class from ingress.className
+    set:
+      ingress.enabled: true
+      ingress.className: nginx
+    asserts:
+      - equal:
+          path: spec.ingressClassName
+          value: nginx
+
+  - it: still accepts the old ingress.ingressClassName
+    set:
+      ingress.enabled: true
+      ingress.ingressClassName: traefik
+    asserts:
+      - equal:
+          path: spec.ingressClassName
+          value: traefik
+
+  - it: leaves the class to the cluster default when unset
+    set:
+      ingress.enabled: true
+    asserts:
+      - notExists:
+          path: spec.ingressClassName
