@@ -18,9 +18,9 @@
     { "type": "refactor", "section": "Refactoring", "hidden": true }
   ],
   "packages": {
-    "charts/foundry-vtt": { "component": "foundry-vtt", "release-as": "1.0.0" },
-    "charts/prometheus-haproxy-exporter": { "component": "prometheus-haproxy-exporter", "release-as": "1.0.0" },
-    "charts/prometheus-pve-exporter": { "component": "prometheus-pve-exporter", "release-as": "1.0.0" },
-    "charts/youtrack": { "component": "youtrack", "release-as": "1.0.0" }
+    "charts/foundry-vtt": { "component": "foundry-vtt" },
+    "charts/prometheus-haproxy-exporter": { "component": "prometheus-haproxy-exporter" },
+    "charts/prometheus-pve-exporter": { "component": "prometheus-pve-exporter" },
+    "charts/youtrack": { "component": "youtrack" }
   }
 }
