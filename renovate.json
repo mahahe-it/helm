@@ -1,0 +1,41 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits"],
+  "timezone": "Europe/Rome",
+  "labels": ["dependencies"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Versions annotated with a '# renovate:' comment on the line above",
+      "managerFilePatterns": [
+        "/^\\.devcontainer/Dockerfile$/",
+        "/^\\.github/workflows/[^/]+\\.ya?ml$/",
+        "/^charts/[^/]+/Chart\\.yaml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?\\s+(?:ARG )?\\w+(?:=|: )\"?(?<currentValue>[^\"\\s]+)\"?"
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Chart images and appVersion ship as a chart patch release",
+      "matchFileNames": ["charts/**"],
+      "semanticCommitType": "fix",
+      "semanticCommitScope": "{{parentDir}}"
+    },
+    {
+      "description": "A new upstream major ships as a chart minor release",
+      "matchFileNames": ["charts/**"],
+      "matchUpdateTypes": ["major"],
+      "semanticCommitType": "feat"
+    },
+    {
+      "description": "Toolbox and CI tooling: one grouped PR, no chart release",
+      "matchFileNames": [".devcontainer/**", ".github/workflows/**"],
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "deps",
+      "groupName": "toolbox and CI"
+    }
+  ]
+}

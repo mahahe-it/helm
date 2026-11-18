@@ -35,8 +35,27 @@ This repository is licensed under the [Apache License 2.0](https://github.com/ma
 This repository is maintained by the MaHaHe DevOps Team. You can contact us at [devops@mahahe.it](mailto:devops@mahahe.it).
 
 ### Contribution
-If contributing from Windows, please run this command before pushing:
-```shell
-git config --global core.autocrlf false
-```
-Every file with `CRLF` as newlines will be rejected.
+
+Tools are pinned in `.devcontainer/Dockerfile`: open the repo in the devcontainer,
+or run `just toolbox` to build the same image as a distrobox. `just --list` shows
+the common tasks (lint, template, docs, unittest, test on kind).
+
+Changes go through pull requests, merged by squash. The PR title becomes the
+commit on `main`, so it must follow [Conventional Commits](https://www.conventionalcommits.org/),
+and it drives the chart version:
+
+| PR title | Chart release |
+|---|---|
+| `fix(youtrack): ...` | patch |
+| `feat(youtrack): ...` | minor |
+| `feat(youtrack)!: ...` or a `BREAKING CHANGE:` footer | major |
+| `docs`, `chore`, `ci`, `test`, ... | none |
+
+The chart a change belongs to is the directory it touches; the scope is for
+readers. Do not bump `version` in `Chart.yaml`: [release-please](https://github.com/googleapis/release-please)
+keeps a release PR open with the next version of every changed chart and its
+`CHANGELOG.md`. Merging it tags `<chart>-<version>`, creates the GitHub release
+and publishes the chart to `oci://ghcr.io/mahahe-it/helm/<chart>`.
+Renovate opens the PRs for upstream image and tooling updates.
+
+Files must use LF line endings (`git config --global core.autocrlf false` on Windows).

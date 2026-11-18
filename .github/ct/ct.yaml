@@ -6,3 +6,5 @@ chart-yaml-schema: .github/ct/chart_schema.yaml
 lint-conf: .github/ct/lintconf.yaml
 helm-extra-args: --timeout 900s
 validate-maintainers: false
+# Versions are bumped by release-please release PRs, not in feature PRs
+check-version-increment: false

@@ -1,0 +1,133 @@
+name: CI
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+# pull_request (not pull_request_target): PR code never runs with write
+# tokens, and secrets are only available to branches of this repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  # renovate: datasource=github-releases depName=helm/helm
+  HELM_VERSION: v4.3.2
+  # renovate: datasource=github-releases depName=norwoodj/helm-docs extractVersion=^v(?<version>.+)$
+  HELM_DOCS_VERSION: 1.14.2
+  # renovate: datasource=github-releases depName=helm-unittest/helm-unittest
+  HELM_UNITTEST_VERSION: v1.2.1
+
+jobs:
+  pr-title:
+    # Squash merges use the PR title as the commit release-please reads
+    name: PR Title
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@v6.1.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  lint:
+    name: Lint Charts
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.list-changed.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: azure/setup-helm@v5.1.0
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.13"
+
+      - uses: helm/chart-testing-action@v2.9.0
+
+      - name: List changed charts
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --config .github/ct/ct.yaml)
+          echo "$changed"
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "charts=$(echo "$changed" | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Lint
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct lint --config .github/ct/ct.yaml
+
+      - name: README up to date (helm-docs)
+        if: steps.list-changed.outputs.changed == 'true'
+        env:
+          CHARTS: ${{ steps.list-changed.outputs.charts }}
+        run: |
+          curl -fsSL "https://github.com/norwoodj/helm-docs/releases/download/v${HELM_DOCS_VERSION}/helm-docs_${HELM_DOCS_VERSION}_Linux_x86_64.tar.gz" \
+            | tar -xz -C "$RUNNER_TEMP" helm-docs
+          "$RUNNER_TEMP/helm-docs" --chart-search-root=charts
+          read -ra charts <<< "$CHARTS"
+          git diff --exit-code -- "${charts[@]/%//README.md}" \
+            || { echo "::error::Chart READMEs are stale: run 'just docs' and commit"; exit 1; }
+
+      - name: Unit tests (helm-unittest)
+        run: |
+          mapfile -t charts < <(find charts -mindepth 2 -maxdepth 2 -type d -name tests -printf '%h\n')
+          if [[ ${#charts[@]} -eq 0 ]]; then echo "No chart has tests/ yet"; exit 0; fi
+          helm plugin install --verify=false https://github.com/helm-unittest/helm-unittest --version "$HELM_UNITTEST_VERSION"
+          helm unittest "${charts[@]}"
+
+  install:
+    name: Install Charts
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v7.0.1
+        if: needs.lint.outputs.changed == 'true'
+        with:
+          fetch-depth: 0
+
+      - uses: azure/setup-helm@v5.1.0
+        if: needs.lint.outputs.changed == 'true'
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - uses: actions/setup-python@v7.1.0
+        if: needs.lint.outputs.changed == 'true'
+        with:
+          python-version: "3.13"
+
+      - uses: helm/chart-testing-action@v2.9.0
+        if: needs.lint.outputs.changed == 'true'
+
+      # foundry-vtt needs a real license to start; the secret is absent on fork PRs
+      - name: Foundry test values
+        id: foundry
+        if: needs.lint.outputs.changed == 'true'
+        env:
+          SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
+        run: |
+          if [[ -n "$SECRET_VALUES" ]]; then
+            echo "$SECRET_VALUES" | base64 -d > charts/foundry-vtt/ci/test-values.yaml
+          else
+            echo "exclude=--excluded-charts foundry-vtt" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: helm/kind-action@v1.15.2
+        if: needs.lint.outputs.changed == 'true'
+
+      - name: Install
+        if: needs.lint.outputs.changed == 'true'
+        run: ct install --config .github/ct/ct.yaml ${{ steps.foundry.outputs.exclude }}
+
+      - name: Nothing to install
+        if: needs.lint.outputs.changed != 'true'
+        run: echo "No chart changed"
