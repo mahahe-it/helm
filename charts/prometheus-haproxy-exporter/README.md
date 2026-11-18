@@ -52,7 +52,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | `rbac.create`     | Specifies whether RBAC resources should be created      | `true` |
 | `rbac.pspEnabled` | Specifies whether a PodSecurityPolicy should be created | `true` |
 
-
 ### serviceAccount
 
 | Name                    | Description                                          | Value  |
@@ -60,7 +59,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | `serviceAccount.create` | Specifies whether a ServiceAccount should be created | `true` |
 | `serviceAccount.name`   | The name of the ServiceAccount to use.               | `nil`  |
 | `replicaCount`          | Desired number of scaper pods                        | `1`    |
-
 
 ### Image Parameters
 
@@ -70,14 +68,12 @@ The command removes all the Kubernetes components associated with the chart and 
 | `image.tag`        | Image tag to use                  | `v0.13.0`                             |
 | `image.pullPolicy` | Pull Policy for the image         | `IfNotPresent`                        |
 
-
 ### Service Parameters
 
 | Name           | Description                                 | Value       |
 | -------------- | ------------------------------------------- | ----------- |
 | `service.type` | Type of Service to deploy                   | `ClusterIP` |
 | `service.port` | Port to use for prometheus-haproxy-exporter | `9101`      |
-
 
 ### Ingress Parameters
 
@@ -89,7 +85,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | `ingress.path`        | path to serve ingress                                                                                                                           | `/`     |
 | `ingress.hosts`       | Ingress hostname for the prometheus-haproxy-exporter server ingress                                                                             | `nil`   |
 
-
 ### haproxy Parameters
 
 | Name                 | Description                                                            | Value                                           |
@@ -97,7 +92,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | `haproxy.verify_ssl` | Enable check if haproxy have valid ssl                                 | `false`                                         |
 | `haproxy.scrapeUri`  | Url to scrape at example https://haproxy.example.com/haproxy?stats;csv | `https://haproxy.example.com/haproxy?stats;csv` |
 | `haproxy.ExtraArgs`  | extra args pass to container startup                                   | `[]`                                            |
-
 
 ### Advanced parameters
 
@@ -114,4 +108,3 @@ The command removes all the Kubernetes components associated with the chart and 
 | `serviceMonitor.interval`  | Interval at which metrics should be scraped                                  | `30s`   |
 | `serviceMonitor.labels`    | Extra labels for the ServiceMonitor                                          | `{}`    |
 | `serviceMonitor.timeout`   | Specify the timeout after which the scrape is ended                          | `10s`   |
-

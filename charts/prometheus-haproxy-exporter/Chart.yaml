@@ -18,7 +18,6 @@ maintainers:
     name: MatteoB99
   - email: haloghen@mahahe.it
     name: Haloghen
-engine: gotpl
 home: https://github.com/prometheus/haproxy_exporter
 sources:
   - https://github.com/prometheus/haproxy_exporter

@@ -1,6 +1,3 @@
-# Deprecation Notice
-This chart, along with all others, is in the process of being ported to **OCI**. All HTTPS releases using the old `https://helm.mahahe.it/` are to be considered deprecated.
-
 # prometheus-pve-exporter
 
 ## TL;DR;
@@ -26,7 +23,7 @@ To install the chart with the release name `my-release`:
 
 ```console
 helm repo add mahahe https://helm.mahahe.it/
-helm install my-release mahahe/prometheus-pve-exporter
+helm install my-release mahahe-it/prometheus-pve-exporter
 ```
 
 These commands deploy prometheus-pve-exporter on the Kubernetes cluster in the default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
@@ -71,6 +68,7 @@ The following tables list the configurable parameters of the prometheus-pve-expo
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
+| extraLabels | object | `{}` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"prompve/prometheus-pve-exporter"` |  |
 | image.tag | string | `""` |  |
@@ -80,18 +78,23 @@ The following tables list the configurable parameters of the prometheus-pve-expo
 | ingress.path | string | `"/"` |  |
 | ingress.tls | list | `[]` |  |
 | nodeSelector | object | `{}` |  |
-| pve.password | string | `"sEcr3T"` |  |
-| pve.target | string | `nil` |  |
-| pve.user | string | `"prometheus@pve"` |  |
-| pve.verify_ssl | bool | `true` |  |
+| pve.password | string | `nil` |  |
+| pve.target | list | `[]` |  |
+| pve.user | string | `"root@pam"` |  |
+| pve.verify_ssl | bool | `false` |  |
 | rbac.create | bool | `true` |  |
-| rbac.pspEnabled | bool | `true` |  |
+| rbac.pspEnabled | bool | `false` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | service.port | int | `9221` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `nil` |  |
+| serviceMonitor.enabled | bool | `false` |  |
+| serviceMonitor.interval | string | `"30s"` |  |
+| serviceMonitor.labels | object | `{}` |  |
+| serviceMonitor.namespace | string | `""` |  |
+| serviceMonitor.timeout | string | `"10s"` |  |
 | tolerations | list | `[]` |  |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
@@ -99,5 +102,5 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```console
-helm install my-release -f values.yaml mahahe/prometheus-pve-exporter
+helm install my-release -f values.yaml mahahe-it/prometheus-pve-exporter
 ```
