@@ -56,109 +56,109 @@ Foundry VTT moves from v10 to v14. Back up `/data` before upgrading: Foundry mig
 
 ### Common Parameters
 
-| Name                                       | Description                                                                                                                     | Value            |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| `nameOverride`                             | Name Override                                                                                                                   | `""`             |
-| `fullnameOverride`                         | FullName Override                                                                                                               | `""`             |
-| `dnsConfig`                                | Override for FoundryVTT DNS Configuration                                                                                       | `{}`             |
-| `podHostname`                              | Pod hostname, fixed so the Foundry license binding survives restarts (defaults to the release fullname)                         | `""`             |
-| `extraEnv`                                 | Extra environment variables for the container (list of EnvVar)                                                                  | `[]`             |
-| `serviceAccount.create`                    | Enable ServiceAccount Creation                                                                                                  | `false`          |
-| `serviceAccount.annotations`               | Extra annotations to add to the ServiceAccount                                                                                  | `{}`             |
-| `serviceAccount.name`                      | Name of the Service Account                                                                                                     | `nil`            |
-| `resources.requests.cpu`                   | Percentile of CPU Requested to run                                                                                              | `500m`           |
-| `resources.requests.memory`                | RAM Requested to run                                                                                                            | `512Mi`          |
-| `resources.limits.cpu`                     | Maximum CPU allowed                                                                                                             | `1000m`          |
-| `resources.limits.memory`                  | Maximum RAM allowed                                                                                                             | `1024Mi`         |
-| `podSecurityContext.runAsNonRoot`          | The image runs as the non-root `node` user                                                                                      | `true`           |
-| `podSecurityContext.runAsUser`             | UID of the `node` user in the image                                                                                             | `1000`           |
-| `podSecurityContext.runAsGroup`            | GID of the `node` user in the image                                                                                             | `1000`           |
-| `podSecurityContext.fsGroup`               | Group that owns the data volume, so the `node` user can write to it (also fixes volumes created by chart versions before 1.0.0) | `1000`           |
-| `podSecurityContext.fsGroupChangePolicy`   | Only change volume ownership when the root of the volume does not match                                                         | `OnRootMismatch` |
-| `podSecurityContext.seccompProfile.type`   | Seccomp profile                                                                                                                 | `RuntimeDefault` |
-| `securityContext.allowPrivilegeEscalation` | Allow privilege escalation                                                                                                      | `false`          |
-| `securityContext.readOnlyRootFilesystem`   | Read-only root filesystem: Foundry writes to /data and to emptyDir volumes only                                                 | `true`           |
-| `securityContext.capabilities.drop`        | Dropped Linux capabilities                                                                                                      | `["ALL"]`        |
-| `startupProbe.failureThreshold`            | Startup probe attempts, 10s apart, before liveness takes over (first start downloads Foundry)                                   | `60`             |
-| `nodeSelector`                             | Pod Node selector                                                                                                               | `{}`             |
-| `tolerations`                              | Pod Tolerations                                                                                                                 | `[]`             |
-| `affinity`                                 | Pod Affinity                                                                                                                    | `{}`             |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| nameOverride | string | `""` | Name Override |
+| fullnameOverride | string | `""` | FullName Override |
+| dnsConfig | object | `{}` | Override for FoundryVTT DNS Configuration |
+| podHostname | string | `""` | Pod hostname, fixed so the Foundry license binding survives restarts (defaults to the release fullname) |
+| extraEnv | list | `[]` | Extra environment variables for the container (list of EnvVar) |
+| serviceAccount.create | bool | `false` | Enable ServiceAccount Creation |
+| serviceAccount.annotations | object | `{}` | Extra annotations to add to the ServiceAccount |
+| serviceAccount.name | string | `nil` | Name of the Service Account |
+| resources.requests.cpu | string | `"500m"` | Percentile of CPU Requested to run |
+| resources.requests.memory | string | `"512Mi"` | RAM Requested to run |
+| resources.limits.cpu | string | `"1000m"` | Maximum CPU allowed |
+| resources.limits.memory | string | `"1024Mi"` | Maximum RAM allowed |
+| podSecurityContext.runAsNonRoot | bool | `true` | The image runs as the non-root `node` user |
+| podSecurityContext.runAsUser | int | `1000` | UID of the `node` user in the image |
+| podSecurityContext.runAsGroup | int | `1000` | GID of the `node` user in the image |
+| podSecurityContext.fsGroup | int | `1000` | Group that owns the data volume, so the `node` user can write to it (also fixes volumes created by chart versions before 1.0.0) |
+| podSecurityContext.fsGroupChangePolicy | string | `"OnRootMismatch"` | Only change volume ownership when the root of the volume does not match |
+| podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` | Seccomp profile |
+| securityContext.allowPrivilegeEscalation | bool | `false` | Allow privilege escalation |
+| securityContext.readOnlyRootFilesystem | bool | `true` | Read-only root filesystem: Foundry writes to /data and to emptyDir volumes only |
+| securityContext.capabilities.drop | list | `["ALL"]` | Dropped Linux capabilities |
+| startupProbe.failureThreshold | int | `60` | Startup probe attempts, 10s apart, before liveness takes over (first start downloads Foundry) |
+| nodeSelector | object | `{}` | Pod Node selector |
+| tolerations | list | `[]` | Pod Tolerations |
+| affinity | object | `{}` | Pod Affinity |
 
 ### Image Parameters
 
-| Name               | Description                                 | Value               |
-| ------------------ | ------------------------------------------- | ------------------- |
-| `image.pullPolicy` | pullPolicy for the Image                    | `IfNotPresent`      |
-| `image.repository` | Repository to take the Image from           | `felddy/foundryvtt` |
-| `image.tag`        | Image tag, defaults to the chart appVersion | `""`                |
-| `imagePullSecrets` | Credentials for Docker private repository.  | `[]`                |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| image.pullPolicy | string | `"IfNotPresent"` | pullPolicy for the Image |
+| image.repository | string | `"felddy/foundryvtt"` | Repository to take the Image from |
+| image.tag | string | `""` | Image tag, defaults to the chart appVersion |
+| imagePullSecrets | list | `[]` | Credentials for Docker private repository. |
 
 ### FoundryVTT Configuration
 
-| Name                             | Description                                                                                                                                                                                                                                                           | Value                |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| `foundryvtt.username`            | Username of the Account who bought the FoundryVTT License                                                                                                                                                                                                             | `""`                 |
-| `foundryvtt.password`            | Password of the Account who bought the FoundryVTT License                                                                                                                                                                                                             | `""`                 |
-| `foundryvtt.licenseKey`          | License Key for FoundryVTT. If set the account infos are ignored.                                                                                                                                                                                                     | `""`                 |
-| `foundryvtt.existingSecret`      | Name of an existing Secret to fetch the account from. If set, account settings from values are ignored. Must be used in combination with `foundryvtt.existingLicenseType` to fetch the correct data                                                                   | `""`                 |
-| `foundryvtt.existingLicenseType` | Type of License to be fetched from the existing secret. Must be either `account` or `licenseKey`. If set to `account`, the `existingSecret` must contain a `username`/`password` data pair. If set to `licenseKey`, the secret must contain a `licenseKey` data entry | `account`            |
-| `foundryvtt.hostname`            | Hostname of FoundryVTT                                                                                                                                                                                                                                                | `foundry.domain.com` |
-| `foundryvtt.language`            | Language to use                                                                                                                                                                                                                                                       | `en.core`            |
-| `foundryvtt.minifyStaticFiles`   | Whether to minify static files or not                                                                                                                                                                                                                                 | `true`               |
-| `foundryvtt.proxySSL`            | Indicates whether the software is running behind a reverse proxy that uses SSL. This allows invitation links and A/V functionality to work as if the Foundry Server had SSL configured directly.                                                                      | `true`               |
-| `foundryvtt.adminPassword`       | Admin Password to Access Admin Page                                                                                                                                                                                                                                   | `""`                 |
-| `foundryvtt.upnp`                | Enable UPNP                                                                                                                                                                                                                                                           | `false`              |
-| `foundryvtt.version`             | Foundry VTT version to install, defaults to the one matching the image                                                                                                                                                                                                | `""`                 |
-| `foundryvtt.world`               | World to load at startup                                                                                                                                                                                                                                              | `""`                 |
-| `foundryvtt.s3.enabled`          | Enable S3 Integration                                                                                                                                                                                                                                                 | `false`              |
-| `foundryvtt.s3.existingSecret`   | Existing Secret containing a aws-credentials.json data entry, which must contain supported values by FoundryVTT. More Info [Here](https://foundryvtt.com/article/aws-s3/)                                                                                             | `""`                 |
-| `foundryvtt.s3.config.endpoint`  | Custom S3 Endpoint, if different from AWS                                                                                                                                                                                                                             | `""`                 |
-| `foundryvtt.s3.config.accessKey` | Access Key ID                                                                                                                                                                                                                                                         | `""`                 |
-| `foundryvtt.s3.config.secretKey` | Secret Access Key                                                                                                                                                                                                                                                     | `""`                 |
-| `foundryvtt.s3.config.region`    | S3 Bucket Region                                                                                                                                                                                                                                                      | `""`                 |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| foundryvtt.username | string | `""` | Username of the Account who bought the FoundryVTT License |
+| foundryvtt.password | string | `""` | Password of the Account who bought the FoundryVTT License |
+| foundryvtt.existingLicenseType | string | `"account"` | Type of License to be fetched from the existing secret. Must be either `account` or `licenseKey`. If set to `account`, the `existingSecret` must contain a `username`/`password` data pair. If set to `licenseKey`, the secret must contain a `licenseKey` data entry |
+| foundryvtt.existingSecret | string | `""` | Name of an existing Secret to fetch the account from. If set, account settings from values are ignored. Must be used in combination with `foundryvtt.existingLicenseType` to fetch the correct data |
+| foundryvtt.licenseKey | string | `""` | License Key for FoundryVTT. If set the account infos are ignored. |
+| foundryvtt.adminPassword | string | `""` | Admin Password to Access Admin Page |
+| foundryvtt.hostname | string | `"foundry.domain.com"` | Hostname of FoundryVTT |
+| foundryvtt.language | string | `"en.core"` | Language to use |
+| foundryvtt.minifyStaticFiles | bool | `true` | Whether to minify static files or not |
+| foundryvtt.proxySSL | bool | `true` | Indicates whether the software is running behind a reverse proxy that uses SSL. This allows invitation links and A/V functionality to work as if the Foundry Server had SSL configured directly. |
+| foundryvtt.s3.enabled | bool | `false` | Enable S3 Integration |
+| foundryvtt.s3.existingSecret | string | `""` | Existing Secret containing a aws-credentials.json data entry, which must contain supported values by FoundryVTT. More Info [Here](https://foundryvtt.com/article/aws-s3/) |
+| foundryvtt.s3.config.accessKey | string | `""` | Access Key ID |
+| foundryvtt.s3.config.secretKey | string | `""` | Secret Access Key |
+| foundryvtt.s3.config.region | string | `""` | S3 Bucket Region |
+| foundryvtt.s3.config.endpoint | string | `""` | Custom S3 Endpoint, if different from AWS |
+| foundryvtt.upnp | bool | `false` | Enable UPNP |
+| foundryvtt.version | string | `""` | Foundry VTT version to install, defaults to the one matching the image |
+| foundryvtt.world | string | `""` | World to load at startup |
 
 ### Service Parameters
 
-| Name                               | Description                                                              | Value       |
-| ---------------------------------- | ------------------------------------------------------------------------ | ----------- |
-| `service.serviceType`              | Type of Service to create, defaults to ClusterIP                         | `ClusterIP` |
-| `service.port`                     | Port to expose                                                           | `80`        |
-| `service.protocol`                 | Protocol to use                                                          | `TCP`       |
-| `service.loadBalancerIP`           | IP to assign to the Service if type LoadBalancer is selected, deprecated | `nil`       |
-| `service.loadBalancerSourceRanges` | Range from which to choose the IP to assign to the Service               | `[]`        |
-| `service.externalTrafficPolicy`    | External Traffic Policy                                                  | `Local`     |
-| `service.labels`                   | Extra labels to assign to the Service                                    | `{}`        |
-| `service.tls`                      | Enable TLS for the Service                                               | `true`      |
-| `service.annotations`              | Extra annotations to assign to the Service                               | `{}`        |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| service.serviceType | string | `"ClusterIP"` | Type of Service to create, defaults to ClusterIP |
+| service.port | int | `80` | Port to expose |
+| service.protocol | string | `"TCP"` | Protocol to use |
+| service.loadBalancerIP | string | `nil` | IP to assign to the Service if type LoadBalancer is selected, deprecated |
+| service.loadBalancerSourceRanges | list | `[]` | Range from which to choose the IP to assign to the Service |
+| service.externalTrafficPolicy | string | `"Local"` | External Traffic Policy |
+| service.labels | object | `{}` | Extra labels to assign to the Service |
+| service.tls | bool | `true` | Enable TLS for the Service |
+| service.annotations | object | `{}` | Extra annotations to assign to the Service |
 
 ### Persistence Parameters
 
-| Name                          | Description                                                                        | Value               |
-| ----------------------------- | ---------------------------------------------------------------------------------- | ------------------- |
-| `persistence.enabled`         | Enable or Disable Persistence                                                      | `true`              |
-| `persistence.storageClass`    | Storage Class to use when creating the Persistent Volume Claim                     | `""`                |
-| `persistence.size`            | Size of the PV to create                                                           | `8Gi`               |
-| `persistence.readAccessModes` | List of ReadAccessModes to use with the PVC                                        | `["ReadWriteOnce"]` |
-| `persistence.existingClaim`   | Name of an existing claim to use instead of creating a new one. If this is set and | `""`                |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| persistence.enabled | bool | `true` | Enable or Disable Persistence |
+| persistence.storageClass | string | `""` | Storage Class to use when creating the Persistent Volume Claim |
+| persistence.size | string | `"8Gi"` | Size of the PV to create |
+| persistence.readAccessModes | list | `["ReadWriteOnce"]` | List of ReadAccessModes to use with the PVC |
+| persistence.existingClaim | string | `""` | Name of an existing claim to use instead of creating a new one. If this is set and |
 
 ### Extra Container Configurations
 
-| Name                       | Description                                                                                                                                                                                                                                                           | Value                   |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| `container.cache`          | Path to use when downloading FoundryVTT                                                                                                                                                                                                                               | `/data/container_cache` |
-| `container.preserveConfig` | Normally new `options.json` and `admin.txt` files are generated by the container at each startup.  Setting this to `true` prevents the container from modifying these files when they exist.  If they do not exist, they will be created as normal. Default is false. | `false`                 |
-| `container.timezone`       | Container [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List), passed as `TZ`. Default is UTC                                                                                                                                       | `UTC`                   |
-| `container.verbose`        | Set to `true` to enable verbose logging for the container utility scripts. Default is false                                                                                                                                                                           | `false`                 |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| container.cache | string | `"/data/container_cache"` | Path to use when downloading FoundryVTT |
+| container.preserveConfig | bool | `false` | Normally new `options.json` and `admin.txt` files are generated by the container at each startup.  Setting this to `true` prevents the container from modifying these files when they exist.  If they do not exist, they will be created as normal. Default is false. |
+| container.timezone | string | `"UTC"` | Container [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List), passed as `TZ`. Default is UTC |
+| container.verbose | bool | `false` | Set to `true` to enable verbose logging for the container utility scripts. Default is false |
 
 ### Ingress Parameters
 
-| Name                           | Description                                    | Value                |
-| ------------------------------ | ---------------------------------------------- | -------------------- |
-| `ingress.enabled`              | Enable Ingress creations                       | `false`              |
-| `ingress.hostname`             | Hostname for FoundryVTT                        | `foundry.domain.com` |
-| `ingress.annotations`          | Ingress Annotations, useful for TLS            | `{}`                 |
-| `ingress.path`                 | FoundryVTT Path                                | `/`                  |
-| `ingress.pathType`             | Type of Path                                   | `Prefix`             |
-| `ingress.tls`                  | Enable or Disable TLS                          | `false`              |
-| `ingress.configurationSnippet` | Extra NGINX Configuration to add as Annotation | `""`                 |
-| `ingress.className`            | Optional Ingress class name                    | `""`                 |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| ingress.enabled | bool | `false` | Enable Ingress creations |
+| ingress.hostname | string | `"foundry.domain.com"` | Hostname for FoundryVTT |
+| ingress.annotations | object | `{}` | Ingress Annotations, useful for TLS |
+| ingress.path | string | `"/"` | FoundryVTT Path |
+| ingress.pathType | string | `"Prefix"` | Type of Path |
+| ingress.configurationSnippet | string | `""` | Extra NGINX Configuration to add as Annotation |
+| ingress.tls | bool | `false` | Enable or Disable TLS |
+| ingress.className | string | `""` | Optional Ingress class name |

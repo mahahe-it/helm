@@ -1,81 +1,122 @@
 # Default values for prometheus-pve-exporter.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+# Every value documented with "# --" ends up in the README (helm-docs).
+
+# -- Number of exporter pods
+# @section -- Common Parameters
+replicaCount: 1
 
 rbac:
-  # Specifies whether RBAC resources should be created
+  # -- Create the Role and RoleBinding for the exporter
+  # @section -- Common Parameters
   create: true
-  # Specifies whether a PodSecurityPolicy should be created
+  # -- Create a PodSecurityPolicy (removed in Kubernetes 1.25)
+  # @section -- Common Parameters
   pspEnabled: false
 
 serviceAccount:
-  # Specifies whether a ServiceAccount should be created
+  # -- Create a ServiceAccount
+  # @section -- Common Parameters
   create: true
-  # The name of the ServiceAccount to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # -- ServiceAccount name; generated from the fullname template when empty and `create` is true
+  # @section -- Common Parameters
   name:
 
-replicaCount: 1
-
 image:
+  # -- Image repository
+  # @section -- Image Parameters
   repository: prompve/prometheus-pve-exporter
+  # -- Image tag, defaults to the chart appVersion
+  # @section -- Image Parameters
   tag: ""
+  # -- Image pull policy
+  # @section -- Image Parameters
   pullPolicy: IfNotPresent
 
 service:
+  # -- Service type
+  # @section -- Service Parameters
   type: ClusterIP
+  # -- Service port of the metrics endpoint
+  # @section -- Service Parameters
   port: 9221
 
+# Ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
+  # -- Create an Ingress for the exporter
+  # @section -- Ingress Parameters
   enabled: false
+  # -- Ingress annotations, e.g. for cert-manager
+  # @section -- Ingress Parameters
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
+  # -- Path served by the Ingress
+  # @section -- Ingress Parameters
   path: /
+  # -- Ingress host names (list of strings)
+  # @section -- Ingress Parameters
   hosts:
     # - chart-example.local
+  # -- Ingress TLS configuration
+  # @section -- Ingress Parameters
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
-  # requests:
-  #  cpu: 100m
-  #  memory: 128Mi
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
-## pve exporter configurations
+# Connection to Proxmox VE, stored in a Secret as the exporter's pve.yml.
+# Ref: https://github.com/prometheus-pve/prometheus-pve-exporter#authentication
 pve:
+  # -- Proxmox VE node scraped by the ServiceMonitor (`target` parameter)
+  # @section -- PVE Parameters
   target: []
+  # -- Proxmox VE user, e.g. `prometheus@pve`
+  # @section -- PVE Parameters
   user: root@pam
+  # -- Password of `user`; ignored when `token_name` is set
+  # @section -- PVE Parameters
   password:
-  # token_name:
-  # token_value:
+  # token_name: API token name, used instead of the password when set
+  # token_value: API token secret
+  # -- Verify the TLS certificate of the Proxmox VE API
+  # @section -- PVE Parameters
   verify_ssl: false
 
+# -- Resources of the exporter container, e.g. `{limits: {cpu: 100m, memory: 128Mi}}`
+# @section -- Advanced Parameters
+resources: {}
+
+# -- Node selector for the exporter pods
+# @section -- Advanced Parameters
+nodeSelector: {}
+
+# -- Tolerations for the exporter pods
+# @section -- Advanced Parameters
+tolerations: []
+
+# -- Affinity for the exporter pods
+# @section -- Advanced Parameters
+affinity: {}
+
+# -- Extra labels added to the ServiceMonitor
+# @section -- Advanced Parameters
 extraLabels: {}
 
+# Prometheus Operator ServiceMonitor, created only when its CRD is installed.
+# Ref: https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.Endpoint
 serviceMonitor:
-  # When set true then use a ServiceMonitor to configure scraping
+  # -- Create a ServiceMonitor for the Prometheus Operator
+  # @section -- ServiceMonitor Parameters
   enabled: false
-  # Set the namespace the ServiceMonitor should be deployed
+  # -- Namespace of the ServiceMonitor, defaults to the release namespace
+  # @section -- ServiceMonitor Parameters
   namespace: ""
-  # Set how frequently Prometheus should scrape
+  # -- Scrape interval
+  # @section -- ServiceMonitor Parameters
   interval: 30s
-  # Set labels for the ServiceMonitor, use this to define your scrape label for Prometheus Operator
+  # -- Extra labels for the ServiceMonitor, e.g. the one your Prometheus selects on
+  # @section -- ServiceMonitor Parameters
   labels: {}
-  # Set timeout for scrape
+  # -- Scrape timeout
+  # @section -- ServiceMonitor Parameters
   timeout: 10s

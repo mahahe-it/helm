@@ -63,37 +63,69 @@ scrape_configs:
 
 The following tables list the configurable parameters of the prometheus-pve-exporter chart and their default values.
 
+### Common Parameters
+
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` |  |
-| extraLabels | object | `{}` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"prompve/prometheus-pve-exporter"` |  |
-| image.tag | string | `""` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.hosts | string | `nil` |  |
-| ingress.path | string | `"/"` |  |
-| ingress.tls | list | `[]` |  |
-| nodeSelector | object | `{}` |  |
-| pve.password | string | `nil` |  |
-| pve.target | list | `[]` |  |
-| pve.user | string | `"root@pam"` |  |
-| pve.verify_ssl | bool | `false` |  |
-| rbac.create | bool | `true` |  |
-| rbac.pspEnabled | bool | `false` |  |
-| replicaCount | int | `1` |  |
-| resources | object | `{}` |  |
-| service.port | int | `9221` |  |
-| service.type | string | `"ClusterIP"` |  |
-| serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `nil` |  |
-| serviceMonitor.enabled | bool | `false` |  |
-| serviceMonitor.interval | string | `"30s"` |  |
-| serviceMonitor.labels | object | `{}` |  |
-| serviceMonitor.namespace | string | `""` |  |
-| serviceMonitor.timeout | string | `"10s"` |  |
-| tolerations | list | `[]` |  |
+| replicaCount | int | `1` | Number of exporter pods |
+| rbac.create | bool | `true` | Create the Role and RoleBinding for the exporter |
+| rbac.pspEnabled | bool | `false` | Create a PodSecurityPolicy (removed in Kubernetes 1.25) |
+| serviceAccount.create | bool | `true` | Create a ServiceAccount |
+| serviceAccount.name | string | `nil` | ServiceAccount name; generated from the fullname template when empty and `create` is true |
+
+### Image Parameters
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| image.repository | string | `"prompve/prometheus-pve-exporter"` | Image repository |
+| image.tag | string | `""` | Image tag, defaults to the chart appVersion |
+| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+
+### Service Parameters
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| service.type | string | `"ClusterIP"` | Service type |
+| service.port | int | `9221` | Service port of the metrics endpoint |
+
+### Ingress Parameters
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| ingress.enabled | bool | `false` | Create an Ingress for the exporter |
+| ingress.annotations | object | `{}` | Ingress annotations, e.g. for cert-manager |
+| ingress.path | string | `"/"` | Path served by the Ingress |
+| ingress.hosts | string | `nil` | Ingress host names (list of strings) |
+| ingress.tls | list | `[]` | Ingress TLS configuration |
+
+### PVE Parameters
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| pve.target | list | `[]` | Proxmox VE node scraped by the ServiceMonitor (`target` parameter) |
+| pve.user | string | `"root@pam"` | Proxmox VE user, e.g. `prometheus@pve` |
+| pve.password | string | `nil` | Password of `user`; ignored when `token_name` is set |
+| pve.verify_ssl | bool | `false` | Verify the TLS certificate of the Proxmox VE API |
+
+### Advanced Parameters
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| resources | object | `{}` | Resources of the exporter container, e.g. `{limits: {cpu: 100m, memory: 128Mi}}` |
+| nodeSelector | object | `{}` | Node selector for the exporter pods |
+| tolerations | list | `[]` | Tolerations for the exporter pods |
+| affinity | object | `{}` | Affinity for the exporter pods |
+| extraLabels | object | `{}` | Extra labels added to the ServiceMonitor |
+
+### ServiceMonitor Parameters
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| serviceMonitor.enabled | bool | `false` | Create a ServiceMonitor for the Prometheus Operator |
+| serviceMonitor.namespace | string | `""` | Namespace of the ServiceMonitor, defaults to the release namespace |
+| serviceMonitor.interval | string | `"30s"` | Scrape interval |
+| serviceMonitor.labels | object | `{}` | Extra labels for the ServiceMonitor, e.g. the one your Prometheus selects on |
+| serviceMonitor.timeout | string | `"10s"` | Scrape timeout |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 

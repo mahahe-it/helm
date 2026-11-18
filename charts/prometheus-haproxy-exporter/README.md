@@ -40,66 +40,66 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ## Parameters
 
-### Rbac
+### Common Parameters
 
-| Name              | Description                                             | Value  |
-| ----------------- | ------------------------------------------------------- | ------ |
-| `rbac.create`     | Specifies whether RBAC resources should be created      | `true` |
-| `rbac.pspEnabled` | Specifies whether a PodSecurityPolicy should be created | `true` |
-
-### serviceAccount
-
-| Name                    | Description                                          | Value  |
-| ----------------------- | ---------------------------------------------------- | ------ |
-| `serviceAccount.create` | Specifies whether a ServiceAccount should be created | `true` |
-| `serviceAccount.name`   | The name of the ServiceAccount to use.               | `nil`  |
-| `replicaCount`          | Desired number of scaper pods                        | `1`    |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| replicaCount | int | `1` | Number of exporter pods |
+| rbac.create | bool | `true` | Create the Role and RoleBinding for the exporter |
+| rbac.pspEnabled | bool | `false` | Create a PodSecurityPolicy (removed in Kubernetes 1.25) |
+| serviceAccount.create | bool | `true` | Create a ServiceAccount |
+| serviceAccount.name | string | `nil` | ServiceAccount name; generated from the fullname template when empty and `create` is true |
 
 ### Image Parameters
 
-| Name               | Description                       | Value                                 |
-| ------------------ | --------------------------------- | ------------------------------------- |
-| `image.repository` | DockerHub image repository to use | `quay.io/prometheus/haproxy-exporter` |
-| `image.tag`        | Image tag, defaults to the chart appVersion | `""` |
-| `image.pullPolicy` | Pull Policy for the image         | `IfNotPresent`                        |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| image.repository | string | `"quay.io/prometheus/haproxy-exporter"` | Image repository |
+| image.tag | string | `""` | Image tag, defaults to the chart appVersion |
+| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 
 ### Service Parameters
 
-| Name           | Description                                 | Value       |
-| -------------- | ------------------------------------------- | ----------- |
-| `service.type` | Type of Service to deploy                   | `ClusterIP` |
-| `service.port` | Port to use for prometheus-haproxy-exporter | `9101`      |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| service.type | string | `"ClusterIP"` | Service type |
+| service.port | int | `9101` | Service port of the metrics endpoint |
 
 ### Ingress Parameters
 
-| Name                  | Description                                                                                                                                     | Value   |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `ingress.enabled`     | Enable the creation of an ingress for the  server                                                                                               | `false` |
-| `ingress.annotations` | Annotations for the prometheus-haproxy-exporter server ingress. To enable certificate autogeneration, place here your cert-manager annotations. | `{}`    |
-| `ingress.tls`         | List of secret for tls key                                                                                                                      | `[]`    |
-| `ingress.path`        | path to serve ingress                                                                                                                           | `/`     |
-| `ingress.hosts`       | Ingress hostname for the prometheus-haproxy-exporter server ingress                                                                             | `nil`   |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| ingress.enabled | bool | `false` | Create an Ingress for the exporter |
+| ingress.annotations | object | `{}` | Ingress annotations, e.g. for cert-manager |
+| ingress.path | string | `"/"` | Path served by the Ingress |
+| ingress.hosts | string | `nil` | Ingress host names (list of strings) |
+| ingress.tls | list | `[]` | Ingress TLS configuration |
 
-### haproxy Parameters
+### HAProxy Parameters
 
-| Name                 | Description                                                            | Value                                           |
-| -------------------- | ---------------------------------------------------------------------- | ----------------------------------------------- |
-| `haproxy.verify_ssl` | Enable check if haproxy have valid ssl                                 | `false`                                         |
-| `haproxy.scrapeUri`  | Url to scrape at example https://haproxy.example.com/haproxy?stats;csv | `https://haproxy.example.com/haproxy?stats;csv` |
-| `haproxy.ExtraArgs`  | extra args pass to container startup                                   | `[]`                                            |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| haproxy.verify_ssl | bool | `false` | Verify the TLS certificate of the HAProxy stats endpoint; `false` adds `--no-haproxy.ssl-verify` |
+| haproxy.scrapeUri | string | `"https://haproxy.example.com/haproxy?stats;csv"` | HAProxy stats URI to scrape (`--haproxy.scrape-uri`) |
+| haproxy.ExtraArgs | list | `[]` | Extra arguments for the exporter |
 
-### Advanced parameters
+### Advanced Parameters
 
-| Name                       | Description                                                                  | Value   |
-| -------------------------- | ---------------------------------------------------------------------------- | ------- |
-| `resources.limits`         | The resources limits for the YouTrack server containers                      | `{}`    |
-| `resources.requests`       | The requested resources for the YouTrack server containers                   | `{}`    |
-| `nodeSelector`             | Node labels for YouTrack server pods assignment                              | `{}`    |
-| `tolerations`              | Tolerations for YouTrack server pods assignment                              | `[]`    |
-| `affinity`                 | Affinity for YouTrack server pods                                            | `{}`    |
-| `extraLabels`              | add extraLabels to all object                                                | `{}`    |
-| `serviceMonitor.enabled`   | Create ServiceMonitor resource for scraping metrics using PrometheusOperator | `false` |
-| `serviceMonitor.namespace` | Namespace in which Prometheus is running                                     | `nil`   |
-| `serviceMonitor.interval`  | Interval at which metrics should be scraped                                  | `30s`   |
-| `serviceMonitor.labels`    | Extra labels for the ServiceMonitor                                          | `{}`    |
-| `serviceMonitor.timeout`   | Specify the timeout after which the scrape is ended                          | `10s`   |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| resources.limits | object | `{}` | Resource limits of the exporter container, e.g. `{cpu: 100m, memory: 128Mi}` |
+| resources.requests | object | `{}` | Resource requests of the exporter container |
+| nodeSelector | object | `{}` | Node selector for the exporter pods |
+| tolerations | list | `[]` | Tolerations for the exporter pods |
+| affinity | object | `{}` | Affinity for the exporter pods |
+| extraLabels | object | `{}` | Extra labels added to the ServiceMonitor |
+
+### ServiceMonitor Parameters
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| serviceMonitor.enabled | bool | `false` | Create a ServiceMonitor for the Prometheus Operator |
+| serviceMonitor.namespace | string | `nil` | Namespace of the ServiceMonitor, defaults to the release namespace |
+| serviceMonitor.interval | string | `"30s"` | Scrape interval |
+| serviceMonitor.labels | object | `{}` | Extra labels for the ServiceMonitor, e.g. the one your Prometheus selects on |
+| serviceMonitor.timeout | string | `"10s"` | Scrape timeout |
