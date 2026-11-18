@@ -108,14 +108,17 @@ jobs:
       - uses: helm/chart-testing-action@v2.9.0
         if: needs.lint.outputs.changed == 'true'
 
-      # foundry-vtt needs a real license to start; the secret is absent on fork PRs
+      # foundry-vtt needs a real license to start; the secret is absent on fork PRs.
+      # Off until #56: felddy/foundryvtt images before 11.315.1 can no longer log
+      # in to foundryvtt.com, so the chart default (10.x) cannot start.
       - name: Foundry test values
         id: foundry
         if: needs.lint.outputs.changed == 'true'
         env:
+          FOUNDRY_INSTALL_TEST: "false"
           SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
         run: |
-          if [[ -n "$SECRET_VALUES" ]]; then
+          if [[ "$FOUNDRY_INSTALL_TEST" == "true" && -n "$SECRET_VALUES" ]]; then
             echo "$SECRET_VALUES" | base64 -d > charts/foundry-vtt/ci/test-values.yaml
           else
             echo "exclude=--excluded-charts foundry-vtt" >> "$GITHUB_OUTPUT"
