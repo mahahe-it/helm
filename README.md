@@ -1,31 +1,36 @@
 [![ArtifactHub](https://img.shields.io/static/v1?label=ArtifactHub&message=Organization&labelColor=EBEBEB&color=417598&logo=ArtifactHub)](https://artifacthub.io/packages/search?org=mahahe&sort=relevance&page=1)
-[![Lint, Test and Deploy Charts](https://github.com/mahahe-it/helm/actions/workflows/chart-workflow.yaml/badge.svg)](https://github.com/mahahe-it/helm/actions/workflows/chart-workflow.yaml)
-[![Helm Website](https://img.shields.io/website/https/helm.mahahe.it/index.yaml?label=Helm%20Repository&logo=Helm&logoColor=0f1689&labelColor=F1FAEE)](https://helm.mahahe.it/)
+[![CI](https://github.com/mahahe-it/helm/actions/workflows/ci.yaml/badge.svg)](https://github.com/mahahe-it/helm/actions/workflows/ci.yaml)
+[![Release](https://github.com/mahahe-it/helm/actions/workflows/release.yaml/badge.svg)](https://github.com/mahahe-it/helm/actions/workflows/release.yaml)
 
 # Mahahe©️ Official Helm Repository
 Applications ready to launch on Kubernetes using [Helm](https://github.com/helm/helm)
 
 ### TL;DR
 ```console
-helm repo add https://helm.mahahe.it/
-helm search repo mahahe
-helm install myrelease helm/<chart>
+helm install my-release oci://ghcr.io/mahahe-it/helm/<chart>
+helm install my-release oci://ghcr.io/mahahe-it/helm/<chart> --version <version>
 ```
 
-![Image](https://transfer.sh/4J32Pv/helm-rec.gif)
+Charts are published as OCI artifacts on GHCR, so no `helm repo add` is needed.
+The HTTPS repository `https://helm.mahahe.it/` (`index.yaml`) is deprecated since
+2026-04-20 and receives no new releases: switch to the `oci://` URLs above.
 
 ### Welcome!
 
-Welcome to the Official MaHaHe Helm Repository! Here you will find various applications packaged and released by MaHaHe, just search through our [repository](https://gitea.mahahe.it/Mahahe/helm), look at the available charts, choose one and install it!
+Welcome to the Official MaHaHe Helm Repository! Here you will find various applications packaged and released by MaHaHe, just browse our [repository](https://github.com/mahahe-it/helm), look at the available charts, choose one and install it!
 
 ### Available Charts
 
-The Applications we offer at the moment are listed down here. Watch this website often to discover new applications and new versions for them.
+The applications we offer at the moment:
 
- - `Prometheus PVE Exporter@0.1.15`
- - `Prometheus Haproxy Exporter@0.1.5`
- - `YouTrack@0.1.9`
- - `FoundryVTT@0.1.4`
+| Chart | Install |
+|---|---|
+| [Foundry VTT](charts/foundry-vtt) | `oci://ghcr.io/mahahe-it/helm/foundry-vtt` |
+| [Prometheus HAProxy Exporter](charts/prometheus-haproxy-exporter) | `oci://ghcr.io/mahahe-it/helm/prometheus-haproxy-exporter` |
+| [Prometheus PVE Exporter](charts/prometheus-pve-exporter) | `oci://ghcr.io/mahahe-it/helm/prometheus-pve-exporter` |
+| [YouTrack](charts/youtrack) | `oci://ghcr.io/mahahe-it/helm/youtrack` |
+
+Versions and changelogs are on the [releases](https://github.com/mahahe-it/helm/releases) page.
 
 ### License
 

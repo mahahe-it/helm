@@ -1,6 +1,3 @@
-# Deprecation Notice
-This chart, along with all others, is in the process of being ported to **OCI**. All HTTPS releases using the old `https://helm.mahahe.it/` are to be considered deprecated.
-
 # YouTrack by MaHaHe
 
 YouTrack is a project management tool that can be adapted to your processes to help you deliver great products.
@@ -10,8 +7,7 @@ YouTrack is a project management tool that can be adapted to your processes to h
 ## TL;DR
 
 ```console
-$ helm repo add mahahe https://helm.mahahe.it/
-$ helm install my-release mahahe/youtrack
+helm install my-release oci://ghcr.io/mahahe-it/helm/youtrack
 ```
 
 ## Introduction
@@ -23,7 +19,7 @@ This chart bootstraps a [YouTrack](https://github.com/mahahe-it/helm/tree/main/c
 To install the chart with the release name `my-release`:
 
 ```console
-$ helm install my-release mahahe/youtrack
+helm install my-release oci://ghcr.io/mahahe-it/helm/youtrack --version <version>
 ```
 
 The command deploys YouTrack on the Kubernetes cluster in the default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
@@ -35,7 +31,7 @@ The command deploys YouTrack on the Kubernetes cluster in the default configurat
 To uninstall/delete the `my-release` deployment:
 
 ```console
-$ helm delete my-release
+helm uninstall my-release
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
