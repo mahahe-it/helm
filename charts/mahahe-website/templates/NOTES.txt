@@ -1,0 +1,10 @@
+{{- if or .Values.ingress.enabled .Values.httpRoute.enabled }}
+The site is routed {{ if .Values.ingress.enabled }}by the Ingress{{ else }}by the HTTPRoute{{ end }} for:
+{{- range .Values.hostnames }}
+  {{ . }}
+{{- end }}
+{{- else }}
+No Ingress or HTTPRoute: try it with
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "mahahe-website.fullname" . }} 8080:{{ .Values.service.port }}
+  curl -H 'Host: www.mahahe.it' http://localhost:8080/
+{{- end }}

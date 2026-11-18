@@ -9,6 +9,7 @@ body:
       # Keep in step with charts/
       options:
         - foundry-vtt
+        - mahahe-website
         - prometheus-haproxy-exporter
         - prometheus-pve-exporter
         - youtrack

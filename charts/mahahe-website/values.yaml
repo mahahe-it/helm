@@ -1,0 +1,117 @@
+# Default values for mahahe-website.
+# Every value documented with "# --" ends up in the README (helm-docs).
+
+# -- Number of nginx pods
+# @section -- Common Parameters
+replicaCount: 2
+
+# -- Partially override the fullname (keeps the release name)
+# @section -- Common Parameters
+nameOverride: ""
+
+# -- Fully override the fullname
+# @section -- Common Parameters
+fullnameOverride: ""
+
+image:
+  # -- Image repository
+  # @section -- Image Parameters
+  repository: ghcr.io/mahahe-it/mahahe-website
+  # -- Image tag, defaults to the chart appVersion
+  # @section -- Image Parameters
+  tag: ""
+  # -- Image pull policy
+  # @section -- Image Parameters
+  pullPolicy: IfNotPresent
+
+# -- Pull secrets for a private registry
+# @section -- Image Parameters
+imagePullSecrets: []
+
+service:
+  # -- Service type
+  # @section -- Service Parameters
+  type: ClusterIP
+  # -- Service port; it forwards to nginx on 8080
+  # @section -- Service Parameters
+  port: 80
+
+# -- Host names routed to the site by the Ingress and the HTTPRoute. nginx
+# picks what to serve by host: `www.mahahe.it` is the site, `helm.mahahe.it`
+# serves the legacy HTTPS chart repository and redirects the rest to www,
+# `mahahe.it` redirects to www.
+# @section -- Routing Parameters
+hostnames:
+  - www.mahahe.it
+  - helm.mahahe.it
+  - mahahe.it
+
+ingress:
+  # -- Create an Ingress
+  # @section -- Routing Parameters
+  enabled: false
+  # -- IngressClass name; empty uses the cluster default
+  # @section -- Routing Parameters
+  className: ""
+  # -- Ingress annotations, e.g. `cert-manager.io/cluster-issuer`
+  # @section -- Routing Parameters
+  annotations: {}
+  # -- TLS configuration, e.g. `[{secretName: mahahe-website-tls, hosts: [www.mahahe.it, helm.mahahe.it, mahahe.it]}]`
+  # @section -- Routing Parameters
+  tls: []
+
+# Gateway API, the alternative to the Ingress: needs the Gateway API CRDs and
+# a Gateway to attach to. TLS is configured on the Gateway listener.
+httpRoute:
+  # -- Create an HTTPRoute (gateway.networking.k8s.io/v1)
+  # @section -- Routing Parameters
+  enabled: false
+  # -- Gateways the route attaches to, e.g. `[{name: public, namespace: gateway, sectionName: https}]`; required when enabled
+  # @section -- Routing Parameters
+  parentRefs: []
+  # -- HTTPRoute annotations
+  # @section -- Routing Parameters
+  annotations: {}
+
+# -- Pod security context: nginx-unprivileged runs as uid 101
+# @section -- Security Parameters
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 101
+  runAsGroup: 101
+  seccompProfile:
+    type: RuntimeDefault
+
+# -- Container security context: read-only root filesystem, nginx writes to an emptyDir on /tmp
+# @section -- Security Parameters
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# -- Container resources
+# @section -- Advanced Parameters
+resources:
+  requests:
+    cpu: 10m
+    memory: 16Mi
+  limits:
+    memory: 64Mi
+
+# -- Extra pod annotations
+# @section -- Advanced Parameters
+podAnnotations: {}
+
+# -- Node selector
+# @section -- Advanced Parameters
+nodeSelector: {}
+
+# -- Tolerations
+# @section -- Advanced Parameters
+tolerations: []
+
+# -- Affinity
+# @section -- Advanced Parameters
+affinity: {}

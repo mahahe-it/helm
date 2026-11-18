@@ -26,6 +26,7 @@ The applications we offer at the moment:
 | Chart | Install |
 |---|---|
 | [Foundry VTT](charts/foundry-vtt) | `oci://ghcr.io/mahahe-it/helm/foundry-vtt` |
+| [MaHaHe website](charts/mahahe-website) | `oci://ghcr.io/mahahe-it/helm/mahahe-website` |
 | [Prometheus HAProxy Exporter](charts/prometheus-haproxy-exporter) | `oci://ghcr.io/mahahe-it/helm/prometheus-haproxy-exporter` |
 | [Prometheus PVE Exporter](charts/prometheus-pve-exporter) | `oci://ghcr.io/mahahe-it/helm/prometheus-pve-exporter` |
 | [YouTrack](charts/youtrack) | `oci://ghcr.io/mahahe-it/helm/youtrack` |

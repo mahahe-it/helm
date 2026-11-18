@@ -1,0 +1,63 @@
+# MaHaHe website
+
+The website of MaHaHe: [www.mahahe.it](https://www.mahahe.it/) and the Helm
+charts page, built with Hugo from [mahahe-it/mahahe-website](https://github.com/mahahe-it/mahahe-website)
+and served by an unprivileged nginx. One deployment answers for every host:
+
+| Host | Serves |
+|---|---|
+| `www.mahahe.it` | the site |
+| `helm.mahahe.it` | the frozen legacy HTTPS chart repository (`index.yaml` and the 0.1.x packages); everything else redirects to `https://www.mahahe.it/helm/` |
+| `mahahe.it` | redirect to `www.mahahe.it` |
+
+## TL;DR
+
+```console
+helm install website oci://ghcr.io/mahahe-it/helm/mahahe-website
+```
+
+## Exposing the site
+
+Route the hosts in `hostnames` with an Ingress or, with the Gateway API, an
+HTTPRoute. TLS ends there; the pods speak plain HTTP.
+
+```yaml
+# Ingress, with cert-manager
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+  tls:
+    - secretName: mahahe-website-tls
+      hosts: [www.mahahe.it, helm.mahahe.it, mahahe.it]
+```
+
+```yaml
+# Gateway API: the Gateway listener holds the certificate
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: public
+      namespace: gateway
+      sectionName: https
+```
+
+## Installing the Chart
+
+```console
+helm install website oci://ghcr.io/mahahe-it/helm/mahahe-website --version <version> -f values.yaml
+```
+
+The pods run as uid 101 with a read-only root filesystem; nginx writes only to
+an `emptyDir` on `/tmp`. Health checks use `GET /healthz`.
+
+## Uninstalling the Chart
+
+```console
+helm uninstall website
+```
+
+## Parameters
+
+{{ template "chart.valuesTable" . }}
