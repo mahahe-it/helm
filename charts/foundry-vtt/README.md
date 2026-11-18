@@ -1,88 +1,97 @@
-# Deprecation Notice
-This chart, along with all others, is in the process of being ported to **OCI**. All HTTPS releases using the old `https://helm.mahahe.it/` are to be considered deprecated.
-
 # Foundry VTT
 
-<!-- BADGES/ -->
+[Foundry VTT](https://foundryvtt.com/) is a standalone application built for experiencing multiplayer tabletop RPGs using a feature-rich and modern self-hosted application where your players connect directly through the browser.
 
-[![FoundryVTT Version: v10.288](https://img.shields.io/badge/foundry-v10.288-brightgreen?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IArs4c6QAAAIRlWElmTU0AKgAAAAgABQESAAMAAAABAAEAAAEaAAUAAAABAAAASgEbAAUAAAABAAAAUgEoAAMAAAABAAIAAIdpAAQAAAABAAAAWgAAAAAAAABIAAAAAQAAAEgAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAAA6gAwAEAAAAAQAAAA4AAAAATspU+QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAAAiFJREFUKBVVks1rE1EUxc+d5tO0prZVSZsUhSBIPyC02ooWurJ0I7rQlRvdC/4N4h9gt7pyoRTswpWgILgQBIOIiC340VhbpC0Ek85MGmPmXc+baWpNGJg77/7uOffeB+z9FHB0FrH9eLwwqpOF0f34KrpsTicW+6L8KE8QhO/n8n1IOgtQHYZA+a/Ai9+Wd6v1g7liq5A2OjKSQNa9hkO4hAzOIylf6CHALk6hoWXsylPkfjyyApaJhVCxmERy5zLSuI7D8h1H5BWht1aBhS6wdI3pN7GabyuyS4JPrchzujmNjDxAVrrRL2PoxRSGxOfjssgEjkkJvVJBWu6h5M7YenvDoOO0OgicD4TPIKWbBG6xvwTaKCMwSU7hKxK6gt8mbsFIMaF5iDyjUg6iPnqc58higCr9fD4iTvWMziAmK2g73f/AADVWX0YXrlChirgOcqL3WXYBYpTfUuxzjkW30dI1C0ZW1RnjMopo4C56MIs6CgQrMER2cJoz9zjdO2iz17g2yZUjqzHWbuA4/ugiEz7DVRe/aLxmcvDQ5Cq+oWGWeDbAgiETXgArrVOFGzR0EkclxrVMcpfLgFThY5roe2yz95ZZkzcbj22+w2VG8Pz6Q/b5Gr6uM9mw04uo6ll4tOlhE8a8xNzGYihCJoT+u3I4kUIp6OM0X9CHHds8frbqsrXlh9CB62nj8L5a9Y4DHR/K68TgcHhoz607Qp34L72X0rdSdM+vAAAAAElFTkSuQmCC)](https://foundryvtt.com/releases/10.288)
-[![Lint, Test and Deploy Charts](https://github.com/mahahe-it/helm/actions/workflows/chart-workflow.yaml/badge.svg?branch=main)](https://github.com/mahahe-it/helm/actions/workflows/chart-workflow.yaml)
-[![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://patreon.com/nerdweekoficial)
-[![GitHub license](https://img.shields.io/github/license/hugoprudente/charts)](https://github.com/hugoprudente/charts/blob/master/LICENSE)
-
-[Foundry VTT](http://foundryvtt.com/) is a standalone application built for experiencing multiplayer tabletop RPGs using a feature-rich and modern self-hosted application where your players connect directly through the browser.
+The chart runs the [felddy/foundryvtt](https://github.com/felddy/foundryvtt-docker) container, which downloads and installs Foundry at startup using your foundryvtt.com account or license.
 
 ## TL;DR
 
 ```console
-$ helm repo add mahahe https://helm.mahahe.it/
-$ helm install my-release mahahe/foundry-vtt
+helm install my-release oci://ghcr.io/mahahe-it/helm/foundry-vtt \
+  --set foundryvtt.username=<foundryvtt.com user> \
+  --set foundryvtt.password=<foundryvtt.com password> \
+  --set foundryvtt.adminPassword=<admin password>
 ```
-
-## Introduction
-
-You can get a [FoundryVTT](https://foundryvtt.com) instance up and running in
-minutes using this chart and Felddy [foundryvtt-docker](https://github.com/felddy/foundryvtt-docker) Docker container.
 
 ## Prerequisites
 
+- Kubernetes 1.25+
 - 512 MB of RAM
-- Kubernetes 1.19+
-- PV provisioner support in the underlying infrastructure
+- A PV provisioner for persistent data (or `persistence.existingClaim`)
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release`:
-
 ```console
-$ helm install my-release mahahe/youtrack
+helm install my-release oci://ghcr.io/mahahe-it/helm/foundry-vtt --version <version> -f values.yaml
 ```
 
-The command deploys YouTrack on the Kubernetes cluster in the default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
+Credentials can come from the values (stored in a Secret created by the chart) or from an existing Secret with `foundryvtt.existingSecret`: it must hold `adminPassword` plus either `username`/`password` (`foundryvtt.existingLicenseType: account`) or `licenseKey` (`foundryvtt.existingLicenseType: licenseKey`).
 
-> **Tip**: List all releases using `helm list`
+The [Parameters](#parameters) section lists everything that can be configured.
 
 ## Uninstalling the Chart
 
-To uninstall/delete the `my-release` deployment:
-
 ```console
-$ helm delete my-release
+helm uninstall my-release
 ```
 
-The command removes all the Kubernetes components associated with the chart and deletes the release.
+The PersistentVolumeClaim is kept: delete it by hand to drop the Foundry data.
+
+## Upgrading
+
+### To 1.0.0
+
+Foundry VTT moves from v10 to v14. Back up `/data` before upgrading: Foundry migrates worlds and modules on first start, and the migration cannot be undone.
+
+- Images before felddy/foundryvtt 11.315.1 can no longer log in to foundryvtt.com, so the previous default (10.288) does not start with account credentials anymore.
+- The container runs as the non-root `node` user (UID/GID 1000) with a read-only root filesystem. The default `podSecurityContext` sets `fsGroup: 1000` so Kubernetes makes the existing data volume writable for it; with a custom `podSecurityContext`, keep an equivalent `fsGroup`.
+- Removed values: `threadCount` (not passed to Foundry by the container anymore), `container.uid`, `container.gid`, `container.preserveOwner`, `foundryvtt.turnConfigs`, `foundryvtt.turnMaxPort` (no longer supported by the container).
+- `image.tag` and `foundryvtt.version` default to the version the chart ships; set them only to pin another release.
+- `container.timezone` is now passed as `TZ`.
+- Probes use Foundry's `/api/status`, with a startup probe (`startupProbe.failureThreshold`, 10 minutes by default) instead of a 10 minute liveness delay.
+- The pod hostname is fixed (`podHostname`, default the release fullname) so the license binding survives restarts.
+- An empty `persistence.storageClass` now uses the cluster default StorageClass instead of one named `default`.
 
 ## Parameters
 
 ### Common Parameters
 
-| Name                         | Description                                    | Value    |
-| ---------------------------- | ---------------------------------------------- | -------- |
-| `nameOverride`               | Name Override                                  | `""`     |
-| `fullnameOverride`           | FullName Override                              | `""`     |
-| `dnsConfig`                  | Override for FoundryVTT DNS Configuration      | `{}`     |
-| `threadCount`                | Override for default NodeJS Thread Count       | `6`      |
-| `serviceAccount.create`      | Enable ServiceAccount Creation                 | `false`  |
-| `serviceAccount.annotations` | Extra annotations to add to the ServiceAccount | `{}`     |
-| `serviceAccount.name`        | Name of the Service Account                    | `nil`    |
-| `resources.requests.cpu`     | Percentile of CPU Requested to run             | `500m`   |
-| `resources.requests.memory`  | RAM Requested to run                           | `512Mi`  |
-| `resources.limits.cpu`       | Maximum CPU allowed                            | `1000m`  |
-| `resources.limits.memory`    | Maximum RAM allowed                            | `1024Mi` |
-| `podSecurityContext`         | Extra security context for Pods                | `{}`     |
-| `securityContext`            | Extra security context                         | `{}`     |
-| `nodeSelector`               | Pod Node selector                              | `{}`     |
-| `tolerations`                | Pod Tolerations                                | `[]`     |
-| `affinity`                   | Pod Affinity                                   | `{}`     |
+| Name                                       | Description                                                                                                                     | Value            |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| `nameOverride`                             | Name Override                                                                                                                   | `""`             |
+| `fullnameOverride`                         | FullName Override                                                                                                               | `""`             |
+| `dnsConfig`                                | Override for FoundryVTT DNS Configuration                                                                                       | `{}`             |
+| `podHostname`                              | Pod hostname, fixed so the Foundry license binding survives restarts (defaults to the release fullname)                         | `""`             |
+| `extraEnv`                                 | Extra environment variables for the container (list of EnvVar)                                                                  | `[]`             |
+| `serviceAccount.create`                    | Enable ServiceAccount Creation                                                                                                  | `false`          |
+| `serviceAccount.annotations`               | Extra annotations to add to the ServiceAccount                                                                                  | `{}`             |
+| `serviceAccount.name`                      | Name of the Service Account                                                                                                     | `nil`            |
+| `resources.requests.cpu`                   | Percentile of CPU Requested to run                                                                                              | `500m`           |
+| `resources.requests.memory`                | RAM Requested to run                                                                                                            | `512Mi`          |
+| `resources.limits.cpu`                     | Maximum CPU allowed                                                                                                             | `1000m`          |
+| `resources.limits.memory`                  | Maximum RAM allowed                                                                                                             | `1024Mi`         |
+| `podSecurityContext.runAsNonRoot`          | The image runs as the non-root `node` user                                                                                      | `true`           |
+| `podSecurityContext.runAsUser`             | UID of the `node` user in the image                                                                                             | `1000`           |
+| `podSecurityContext.runAsGroup`            | GID of the `node` user in the image                                                                                             | `1000`           |
+| `podSecurityContext.fsGroup`               | Group that owns the data volume, so the `node` user can write to it (also fixes volumes created by chart versions before 1.0.0) | `1000`           |
+| `podSecurityContext.fsGroupChangePolicy`   | Only change volume ownership when the root of the volume does not match                                                         | `OnRootMismatch` |
+| `podSecurityContext.seccompProfile.type`   | Seccomp profile                                                                                                                 | `RuntimeDefault` |
+| `securityContext.allowPrivilegeEscalation` | Allow privilege escalation                                                                                                      | `false`          |
+| `securityContext.readOnlyRootFilesystem`   | Read-only root filesystem: Foundry writes to /data and to emptyDir volumes only                                                 | `true`           |
+| `securityContext.capabilities.drop`        | Dropped Linux capabilities                                                                                                      | `["ALL"]`        |
+| `startupProbe.failureThreshold`            | Startup probe attempts, 10s apart, before liveness takes over (first start downloads Foundry)                                   | `60`             |
+| `nodeSelector`                             | Pod Node selector                                                                                                               | `{}`             |
+| `tolerations`                              | Pod Tolerations                                                                                                                 | `[]`             |
+| `affinity`                                 | Pod Affinity                                                                                                                    | `{}`             |
 
 ### Image Parameters
 
-| Name               | Description                                | Value               |
-| ------------------ | ------------------------------------------ | ------------------- |
-| `image.pullPolicy` | pullPolicy for the Image                   | `IfNotPresent`      |
-| `image.repository` | Repository to take the Image from          | `felddy/foundryvtt` |
-| `image.tag`        | Image Tag                                  | `10.288`            |
-| `imagePullSecrets` | Credentials for Docker private repository. | `[]`                |
+| Name               | Description                                 | Value               |
+| ------------------ | ------------------------------------------- | ------------------- |
+| `image.pullPolicy` | pullPolicy for the Image                    | `IfNotPresent`      |
+| `image.repository` | Repository to take the Image from           | `felddy/foundryvtt` |
+| `image.tag`        | Image tag, defaults to the chart appVersion | `""`                |
+| `imagePullSecrets` | Credentials for Docker private repository.  | `[]`                |
 
 ### FoundryVTT Configuration
 
@@ -99,7 +108,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `foundryvtt.proxySSL`            | Indicates whether the software is running behind a reverse proxy that uses SSL. This allows invitation links and A/V functionality to work as if the Foundry Server had SSL configured directly.                                                                      | `true`               |
 | `foundryvtt.adminPassword`       | Admin Password to Access Admin Page                                                                                                                                                                                                                                   | `""`                 |
 | `foundryvtt.upnp`                | Enable UPNP                                                                                                                                                                                                                                                           | `false`              |
-| `foundryvtt.version`             | FoundryVTT Version to use                                                                                                                                                                                                                                             | `10.288`             |
+| `foundryvtt.version`             | Foundry VTT version to install, defaults to the one matching the image                                                                                                                                                                                                | `""`                 |
 | `foundryvtt.world`               | World to load at startup                                                                                                                                                                                                                                              | `""`                 |
 | `foundryvtt.s3.enabled`          | Enable S3 Integration                                                                                                                                                                                                                                                 | `false`              |
 | `foundryvtt.s3.existingSecret`   | Existing Secret containing a aws-credentials.json data entry, which must contain supported values by FoundryVTT. More Info [Here](https://foundryvtt.com/article/aws-s3/)                                                                                             | `""`                 |
@@ -138,7 +147,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
 | `container.cache`          | Path to use when downloading FoundryVTT                                                                                                                                                                                                                               | `/data/container_cache` |
 | `container.preserveConfig` | Normally new `options.json` and `admin.txt` files are generated by the container at each startup.  Setting this to `true` prevents the container from modifying these files when they exist.  If they do not exist, they will be created as normal. Default is false. | `false`                 |
-| `container.timezone`       | Container [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List). Default is UTC                                                                                                                                                       | `UTC`                   |
+| `container.timezone`       | Container [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List), passed as `TZ`. Default is UTC                                                                                                                                       | `UTC`                   |
 | `container.verbose`        | Set to `true` to enable verbose logging for the container utility scripts. Default is false                                                                                                                                                                           | `false`                 |
 
 ### Ingress Parameters
@@ -152,3 +161,4 @@ The command removes all the Kubernetes components associated with the chart and 
 | `ingress.pathType`             | Type of Path                                   | `Prefix`             |
 | `ingress.tls`                  | Enable or Disable TLS                          | `false`              |
 | `ingress.configurationSnippet` | Extra NGINX Configuration to add as Annotation | `""`                 |
+| `ingress.className`            | Optional Ingress class name                    | `""`                 |

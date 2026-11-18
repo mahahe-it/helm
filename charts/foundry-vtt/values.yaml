@@ -6,14 +6,16 @@
 ## @param nameOverride Name Override
 ## @param fullnameOverride FullName Override
 ## @param dnsConfig Override for FoundryVTT DNS Configuration
-## @param threadCount Override for default NodeJS Thread Count
+## @param podHostname Pod hostname, fixed so the Foundry license binding survives restarts (defaults to the release fullname)
+## @param extraEnv Extra environment variables for the container (list of EnvVar)
 ## @param serviceAccount.create Enable ServiceAccount Creation
 ## @param serviceAccount.annotations Extra annotations to add to the ServiceAccount
 ## @param serviceAccount.name Name of the Service Account
 nameOverride: ""
 fullnameOverride: ""
 dnsConfig: {}
-threadCount: "6"
+podHostname: ""
+extraEnv: []
 serviceAccount:
   # Specifies whether a service account should be created
   create: false
@@ -30,8 +32,16 @@ serviceAccount:
 ## @param resources.requests.memory RAM Requested to run
 ## @param resources.limits.cpu Maximum CPU allowed
 ## @param resources.limits.memory Maximum RAM allowed
-## @param podSecurityContext Extra security context for Pods
-## @param securityContext Extra security context
+## @param podSecurityContext.runAsNonRoot The image runs as the non-root `node` user
+## @param podSecurityContext.runAsUser UID of the `node` user in the image
+## @param podSecurityContext.runAsGroup GID of the `node` user in the image
+## @param podSecurityContext.fsGroup Group that owns the data volume, so the `node` user can write to it (also fixes volumes created by chart versions before 1.0.0)
+## @param podSecurityContext.fsGroupChangePolicy Only change volume ownership when the root of the volume does not match
+## @param podSecurityContext.seccompProfile.type Seccomp profile
+## @param securityContext.allowPrivilegeEscalation Allow privilege escalation
+## @param securityContext.readOnlyRootFilesystem Read-only root filesystem: Foundry writes to /data and to emptyDir volumes only
+## @param securityContext.capabilities.drop Dropped Linux capabilities
+## @param startupProbe.failureThreshold Startup probe attempts, 10s apart, before liveness takes over (first start downloads Foundry)
 ## @param nodeSelector Pod Node selector
 ## @param tolerations Pod Tolerations
 ## @param affinity Pod Affinity
@@ -47,15 +57,22 @@ resources:
     cpu: 1000m
     memory: 1024Mi
 
-podSecurityContext: {}
-  # fsGroup: 2000
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch
+  seccompProfile:
+    type: RuntimeDefault
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+startupProbe:
+  failureThreshold: 60
 nodeSelector: {}
 tolerations: []
 affinity: {}
@@ -64,11 +81,11 @@ affinity: {}
 ## @section Image Parameters
 ## @param image.pullPolicy pullPolicy for the Image
 ## @param image.repository Repository to take the Image from
-## @param image.tag Image Tag
+## @param image.tag Image tag, defaults to the chart appVersion
 image:
   pullPolicy: IfNotPresent
   repository: felddy/foundryvtt
-  tag: 10.288
+  tag: ""
 
 ## @param imagePullSecrets Credentials for Docker private repository.
 imagePullSecrets: []
@@ -85,7 +102,7 @@ imagePullSecrets: []
 ## @param foundryvtt.proxySSL Indicates whether the software is running behind a reverse proxy that uses SSL. This allows invitation links and A/V functionality to work as if the Foundry Server had SSL configured directly.
 ## @param foundryvtt.adminPassword Admin Password to Access Admin Page
 ## @param foundryvtt.upnp Enable UPNP
-## @param foundryvtt.version FoundryVTT Version to use
+## @param foundryvtt.version Foundry VTT version to install, defaults to the one matching the image
 ## @param foundryvtt.world World to load at startup
 ## @param foundryvtt.s3.enabled Enable S3 Integration
 ## @param foundryvtt.s3.existingSecret Existing Secret containing a aws-credentials.json data entry, which must contain supported values by FoundryVTT. More Info [Here](https://foundryvtt.com/article/aws-s3/)
@@ -96,7 +113,7 @@ imagePullSecrets: []
 foundryvtt:
   ###########################################
   ### All configurations details are provided here: https://foundryvtt.com/article/hosting/
-  ### All supported environment variables can be found here: https://github.com/felddy/foundryvtt-docker/README.md
+  ### All supported environment variables can be found here: https://github.com/felddy/foundryvtt-docker#environment-variables
 
   ## Account username or email address for foundryvtt.com. Required for downloading an application distribution.
 
@@ -151,23 +168,11 @@ foundryvtt:
   # sslCert: null
   # sslKey: null
 
-  ## An array of TURN configurations in JSON format. See: [Using a Custom Relay Server](https://foundryvtt.com/article/audio-video/custom). To disable the internal relay server comment the paramenter. It will be converted when stored in the secrets
-  # turnConfigs:
-  #   - url: "turn:example.com:3478"
-  #     urls:
-  #       - "turn:example.com:3478"
-  #       - "turns:example.com:5349"
-  #     username: "my username"
-  #     credential: "my password"
-
-  ## Sets the maximum UDP port used by the internal [TURN relay server](https://foundryvtt.com/article/audio-video/).  This value must be greater than `49152`.  _Note: To use the internal relay server its ports must be published.
-  # turnMaxPort: 52300
-
   ## Allow Universal Plug and Play to automatically request port forwarding for the Foundry VTT port to your local network address. Default is false.
   upnp: false
 
-  ## Version of Foundry VTT to install.
-  version: 10.288
+  ## Version of Foundry VTT to install (e.g. "14.370"). Leave empty to use the version matching the image.
+  version: ""
 
   ## The world startup at system start.
   world: ""
@@ -217,15 +222,11 @@ persistence:
 ## @section Extra Container Configurations
 ## @param container.cache Path to use when downloading FoundryVTT
 ## @param container.preserveConfig Normally new `options.json` and `admin.txt` files are generated by the container at each startup.  Setting this to `true` prevents the container from modifying these files when they exist.  If they do not exist, they will be created as normal. Default is false.
-## @param container.timezone Container [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List). Default is UTC
+## @param container.timezone Container [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List), passed as `TZ`. Default is UTC
 ## @param container.verbose Set to `true` to enable verbose logging for the container utility scripts. Default is false
-### @param container.gid `GID` The daemon will be run under. Default is `foundry`
 container:
   ## Set a different path to cache downloads of the Foundry distribution archive and speed up subsequent container startups. From v9.255.1 and v10.260.1 the /data/container_cache is created by default this is now enable by default to keep it consistent.
   cache: /data/container_cache
-
-  ## `gid` the daemon will be run under. Default is `foundry`
-  # gid: 421
 
   ## Set a path to a directory of shell scripts to be sourced after Foundry is installed but before it is started. The path should be in /data or another persistent mount point in the container. e.g.; /data/container_patches Patch files are sourced in lexicographic order. CONTAINER_PATCHES are processed after CONTAINER_PATCH_URLS.
   # patches: /data/patches
@@ -237,13 +238,7 @@ container:
 
   preserveConfig: false
 
-  ## Normally the ownership of the `/data` directory and its contents are changed to match that of the server at startup.  Setting this to a regular expression will exclude any matching paths and preserve their ownership.   _Note: This is a match on the whole path, not a search._  This is useful if you want mount a volume as read-only inside `/data`
-  # preserveOwner:
-
   timezone: UTC
-
-  ## `uid` the daemon will be run under. Default is `foundry`
-  # uid: 421
 
   verbose: false
 

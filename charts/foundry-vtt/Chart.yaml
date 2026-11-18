@@ -3,7 +3,8 @@ name: foundry-vtt
 description: Foundry Virtual Tabletop
 type: application
 version: 0.1.7
-appVersion: "v10.288"
+# renovate: datasource=docker depName=felddy/foundryvtt
+appVersion: "14.370.0"
 keywords:
   - game
   - server
