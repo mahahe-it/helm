@@ -1,0 +1,85 @@
+suite: deployment
+templates:
+  - deployment.yaml
+  - service.yaml
+release:
+  name: site
+chart:
+  appVersion: 1.2.3
+tests:
+  - it: uses the chart appVersion as image tag by default
+    template: deployment.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/mahahe-it/mahahe-website:1.2.3
+      - equal:
+          path: metadata.labels["app.kubernetes.io/version"]
+          value: 1.2.3
+
+  - it: uses image.tag when set
+    template: deployment.yaml
+    set:
+      image.tag: 1.0.0
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: ghcr.io/mahahe-it/mahahe-website:1.0.0
+
+  - it: runs two replicas by default
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 2
+
+  - it: checks /healthz on 8080
+    template: deployment.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: http
+            containerPort: 8080
+            protocol: TCP
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /healthz
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.path
+          value: /healthz
+
+  - it: runs as uid 101 with a read-only root filesystem and a writable /tmp
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 101
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
+          value: true
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: tmp
+            mountPath: /tmp
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: tmp
+            emptyDir: {}
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: exposes port 80 on the http container port
+    template: service.yaml
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 80
+      - equal:
+          path: spec.ports[0].targetPort
+          value: http

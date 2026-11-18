@@ -1,0 +1,25 @@
+apiVersion: v2
+name: mahahe-website
+description: The MaHaHe website (www.mahahe.it and helm.mahahe.it), a static Hugo site served by nginx
+type: application
+version: 0.0.0
+# renovate: datasource=docker depName=ghcr.io/mahahe-it/mahahe-website
+appVersion: "1.0.0"
+keywords:
+  - website
+  - hugo
+  - nginx
+home: https://www.mahahe.it/
+sources:
+  - https://github.com/mahahe-it/mahahe-website
+  - https://github.com/mahahe-it/helm/tree/main/charts/mahahe-website
+maintainers:
+  - name: MaHaHe DevOps
+    email: devops@mahahe.it
+    url: https://www.mahahe.it/
+annotations:
+  "artifacthub.io/links": |
+    - name: Chart Source
+      url: https://github.com/mahahe-it/helm
+    - name: Website Source
+      url: https://github.com/mahahe-it/mahahe-website

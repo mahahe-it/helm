@@ -1,0 +1,104 @@
+suite: routing
+templates:
+  - ingress.yaml
+  - httproute.yaml
+release:
+  name: site
+tests:
+  - it: creates neither an Ingress nor an HTTPRoute by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: routes every host name through the Ingress
+    template: ingress.yaml
+    set:
+      ingress.enabled: true
+      ingress.className: nginx
+    asserts:
+      - isKind:
+          of: Ingress
+      - equal:
+          path: spec.ingressClassName
+          value: nginx
+      - lengthEqual:
+          path: spec.rules
+          count: 3
+      - equal:
+          path: spec.rules[0].host
+          value: www.mahahe.it
+      - equal:
+          path: spec.rules[1].host
+          value: helm.mahahe.it
+      - equal:
+          path: spec.rules[2].host
+          value: mahahe.it
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service
+          value:
+            name: site-mahahe-website
+            port:
+              number: 80
+      - notExists:
+          path: spec.tls
+
+  - it: adds Ingress TLS and annotations
+    template: ingress.yaml
+    set:
+      ingress.enabled: true
+      ingress.annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
+      ingress.tls:
+        - secretName: site-tls
+          hosts: [www.mahahe.it]
+    asserts:
+      - equal:
+          path: metadata.annotations["cert-manager.io/cluster-issuer"]
+          value: letsencrypt
+      - equal:
+          path: spec.tls[0].secretName
+          value: site-tls
+
+  - it: requires a Gateway for the HTTPRoute
+    template: httproute.yaml
+    set:
+      httpRoute.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: httpRoute.parentRefs needs at least one Gateway
+
+  - it: attaches the HTTPRoute to the Gateway for every host name
+    template: httproute.yaml
+    set:
+      httpRoute.enabled: true
+      httpRoute.parentRefs:
+        - name: public
+          namespace: gateway
+          sectionName: https
+      hostnames:
+        - www.example.com
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - isAPIVersion:
+          of: gateway.networking.k8s.io/v1
+      - equal:
+          path: spec.parentRefs[0]
+          value:
+            name: public
+            namespace: gateway
+            sectionName: https
+      - equal:
+          path: spec.hostnames
+          value:
+            - www.example.com
+      - equal:
+          path: spec.rules[0].backendRefs[0]
+          value:
+            name: site-mahahe-website
+            port: 80
+      - equal:
+          path: spec.rules[0].matches[0].path
+          value:
+            type: PathPrefix
+            value: /

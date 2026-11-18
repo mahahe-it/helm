@@ -19,6 +19,7 @@
   ],
   "packages": {
     "charts/foundry-vtt": { "component": "foundry-vtt" },
+    "charts/mahahe-website": { "component": "mahahe-website", "release-as": "1.0.0" },
     "charts/prometheus-haproxy-exporter": { "component": "prometheus-haproxy-exporter" },
     "charts/prometheus-pve-exporter": { "component": "prometheus-pve-exporter" },
     "charts/youtrack": { "component": "youtrack" }
