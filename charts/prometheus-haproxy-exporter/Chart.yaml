@@ -3,7 +3,7 @@ name: prometheus-haproxy-exporter
 description: A Helm chart to export the metrics from haproxy in Prometheus format.
 version: 1.0.0
 # renovate: datasource=docker depName=quay.io/prometheus/haproxy-exporter
-appVersion: "v0.13.0"
+appVersion: "v0.15.0"
 keywords:
   - haproxy-exporter
   - prometheus
