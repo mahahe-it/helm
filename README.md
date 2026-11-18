@@ -40,15 +40,15 @@ Tools are pinned in `.devcontainer/Dockerfile`: open the repo in the devcontaine
 or run `just toolbox` to build the same image as a distrobox. `just --list` shows
 the common tasks (lint, template, docs, unittest, test on kind).
 
-Changes go through pull requests, merged by squash. The PR title becomes the
-commit on `main`, so it must follow [Conventional Commits](https://www.conventionalcommits.org/),
+Changes go through pull requests, merged by squash. The PR title alone becomes
+the commit on `main`, so it must follow [Conventional Commits](https://www.conventionalcommits.org/),
 and it drives the chart version:
 
 | PR title | Chart release |
 |---|---|
 | `fix(youtrack): ...` | patch |
 | `feat(youtrack): ...` | minor |
-| `feat(youtrack)!: ...` or a `BREAKING CHANGE:` footer | major |
+| `feat(youtrack)!: ...` (breaking change) | major |
 | `docs`, `chore`, `ci`, `test`, ... | none |
 
 The chart a change belongs to is the directory it touches; the scope is for
