@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/mahahe-it/helm/compare/foundry-vtt-1.0.1...foundry-vtt-1.0.2) (2026-11-18)
+
+
+### Bug Fixes
+
+* **foundry-vtt:** honour ingress.className ([#73](https://github.com/mahahe-it/helm/issues/73)) ([609278b](https://github.com/mahahe-it/helm/commit/609278bc90315577d9f81bee9adc5840a55808d3))
+
 ## [1.0.1](https://github.com/mahahe-it/helm/compare/foundry-vtt-1.0.0...foundry-vtt-1.0.1) (2026-11-18)
 
 
