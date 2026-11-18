@@ -3,7 +3,7 @@ name: prometheus-pve-exporter
 description: A Helm chart to export the metrics from pve in Prometheus format.
 version: 1.0.0
 # renovate: datasource=docker depName=prompve/prometheus-pve-exporter
-appVersion: "2.2.3"
+appVersion: "2.3.1"
 keywords:
   - pve-exporter
 annotations:
