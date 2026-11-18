@@ -19,3 +19,7 @@
 .project
 .idea/
 *.tmproj
+# helm-unittest suites
+tests/
+# chart-testing values, CI only
+ci/

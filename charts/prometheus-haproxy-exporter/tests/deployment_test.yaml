@@ -1,0 +1,54 @@
+suite: deployment
+templates:
+  - deployment.yaml
+release:
+  name: haproxy
+chart:
+  appVersion: v1.2.3
+tests:
+  - it: uses the chart appVersion as image tag by default
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: quay.io/prometheus/haproxy-exporter:v1.2.3
+
+  - it: uses image.tag when set
+    set:
+      image.tag: v0.15.0
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: quay.io/prometheus/haproxy-exporter:v0.15.0
+
+  - it: scrapes the configured URI without TLS verification by default
+    set:
+      haproxy.scrapeUri: https://lb.example.com/stats;csv
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - --haproxy.scrape-uri=https://lb.example.com/stats;csv
+            - --no-haproxy.ssl-verify
+
+  - it: verifies TLS and appends extra arguments when asked
+    set:
+      haproxy.verify_ssl: true
+      haproxy.ExtraArgs:
+        - --log.level=debug
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].args
+          content: --no-haproxy.ssl-verify
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content: --log.level=debug
+
+  - it: sets the replica count
+    set:
+      replicaCount: 2
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 2

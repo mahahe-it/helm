@@ -1,0 +1,46 @@
+suite: servicemonitor
+templates:
+  - servicemonitor.yaml
+release:
+  name: pve
+  namespace: monitoring
+tests:
+  - it: is off by default
+    capabilities:
+      apiVersions:
+        - monitoring.coreos.com/v1
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: needs the Prometheus Operator CRD
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: scrapes /pve on the service port
+    capabilities:
+      apiVersions:
+        - monitoring.coreos.com/v1
+    set:
+      serviceMonitor.enabled: true
+      serviceMonitor.namespace: prometheus
+      serviceMonitor.labels:
+        prometheus: main
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+      - equal:
+          path: metadata.namespace
+          value: prometheus
+      - equal:
+          path: metadata.labels.prometheus
+          value: main
+      - equal:
+          path: spec.endpoints[0].path
+          value: /pve
+      - equal:
+          path: spec.endpoints[0].targetPort
+          value: 9221

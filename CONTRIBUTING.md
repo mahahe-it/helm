@@ -32,6 +32,22 @@ Each chart's `README.md` is generated from its `README.md.gotmpl`: edit the
 template (and the `values.yaml` comments), then run `just docs`. Files must
 use LF line endings (`git config --global core.autocrlf false` on Windows).
 
+## Tests
+
+Each chart has [helm-unittest](https://github.com/helm-unittest/helm-unittest)
+suites in `charts/<chart>/tests/*_test.yaml`; `just unittest` runs them and CI
+blocks the merge when one fails. Conventions:
+
+- Assertions (`equal`, `contains`, `hasDocuments`, `failedTemplate`, ...), not
+  snapshots: a test states the behaviour it protects, and unrelated template
+  changes do not break it.
+- Suites set `release.name` and a fixed `chart.appVersion`, so names are
+  predictable and Renovate's `appVersion` bumps do not touch the tests.
+- A bug fix comes with the test that would have caught it.
+
+`tests/` and `ci/` are listed in each chart's `.helmignore`, so they stay out
+of the published package.
+
 ## Pull requests
 
 Changes go through pull requests against `main`, merged by squash. The PR

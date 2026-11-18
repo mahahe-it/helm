@@ -1,0 +1,45 @@
+suite: pvc
+templates:
+  - pvc.yaml
+release:
+  name: vtt
+tests:
+  - it: leaves the storage class to the cluster default
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - notExists:
+          path: spec.storageClassName
+      - equal:
+          path: spec.resources.requests.storage
+          value: 8Gi
+
+  - it: sets the storage class when given
+    set:
+      persistence.storageClass: fast
+    asserts:
+      - equal:
+          path: spec.storageClassName
+          value: fast
+
+  - it: disables dynamic provisioning with "-"
+    set:
+      persistence.storageClass: "-"
+    asserts:
+      - equal:
+          path: spec.storageClassName
+          value: ""
+
+  - it: creates no PVC with an existing claim
+    set:
+      persistence.existingClaim: foundry-data
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: creates no PVC without persistence
+    set:
+      persistence.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
