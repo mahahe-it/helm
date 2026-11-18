@@ -1,0 +1,50 @@
+suite: servicemonitor
+templates:
+  - servicemonitor.yaml
+release:
+  name: haproxy
+  namespace: monitoring
+tests:
+  - it: is off by default
+    capabilities:
+      apiVersions:
+        - monitoring.coreos.com/v1
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: needs the Prometheus Operator CRD
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: creates the ServiceMonitor with labels, interval and timeout
+    capabilities:
+      apiVersions:
+        - monitoring.coreos.com/v1
+    set:
+      serviceMonitor.enabled: true
+      serviceMonitor.labels:
+        prometheus: main
+      extraLabels:
+        team: infra
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+      - equal:
+          path: metadata.namespace
+          value: monitoring
+      - equal:
+          path: metadata.labels.prometheus
+          value: main
+      - equal:
+          path: metadata.labels.team
+          value: infra
+      - equal:
+          path: spec.endpoints[0].interval
+          value: 30s
+      - equal:
+          path: spec.endpoints[0].scrapeTimeout
+          value: 10s

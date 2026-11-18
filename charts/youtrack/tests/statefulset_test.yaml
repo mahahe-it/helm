@@ -1,0 +1,68 @@
+suite: statefulset
+templates:
+  - deployment.yaml
+  - service.yaml
+release:
+  name: yt
+chart:
+  appVersion: 2026.2.1
+tests:
+  - it: uses the chart appVersion as image tag by default
+    template: deployment.yaml
+    asserts:
+      - isKind:
+          of: StatefulSet
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: jetbrains/youtrack:2026.2.1
+
+  - it: uses image.tag when set
+    template: deployment.yaml
+    set:
+      image.tag: 2025.3.100
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: jetbrains/youtrack:2025.3.100
+
+  - it: listens on 8080
+    template: deployment.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            name: http
+            containerPort: 8080
+          any: true
+
+  - it: exposes the service port on the http container port
+    template: service.yaml
+    set:
+      service.type: NodePort
+    asserts:
+      - equal:
+          path: spec.type
+          value: NodePort
+      - equal:
+          path: spec.ports[0].port
+          value: 8080
+      - equal:
+          path: spec.ports[0].targetPort
+          value: http
+
+  - it: keeps data, conf, logs and backups on persistent volumes
+    template: deployment.yaml
+    asserts:
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 4
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: data
+            mountPath: /opt/youtrack/data
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: backups
+            mountPath: /opt/youtrack/backups

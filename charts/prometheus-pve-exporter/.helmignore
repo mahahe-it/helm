@@ -19,3 +19,5 @@
 .project
 .idea/
 *.tmproj
+# helm-unittest suites
+tests/

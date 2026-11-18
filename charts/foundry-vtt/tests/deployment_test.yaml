@@ -1,0 +1,190 @@
+suite: deployment
+templates:
+  - deployment.yaml
+release:
+  name: vtt
+chart:
+  appVersion: 1.2.3
+set:
+  foundryvtt.adminPassword: admin
+tests:
+  - it: uses the chart appVersion as image tag by default
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: felddy/foundryvtt:1.2.3
+
+  - it: uses image.tag when set
+    set:
+      image.tag: 13.351.0
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: felddy/foundryvtt:13.351.0
+
+  - it: recreates the pod instead of rolling it (single RWO volume)
+    asserts:
+      - equal:
+          path: spec.strategy.type
+          value: Recreate
+
+  - it: pins the pod hostname so the license binding survives restarts
+    asserts:
+      - equal:
+          path: spec.template.spec.hostname
+          value: vtt-foundry-vtt
+  - it: uses podHostname when set
+    set:
+      podHostname: table
+    asserts:
+      - equal:
+          path: spec.template.spec.hostname
+          value: table
+
+  - it: probes /api/status
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.httpGet.path
+          value: /api/status
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.path
+          value: /api/status
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /api/status
+  - it: prefixes the probe path with routePrefix
+    set:
+      foundryvtt.routePrefix: /foundry/
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /foundry/api/status
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FOUNDRY_ROUTE_PREFIX
+            value: /foundry/
+
+  - it: reads account credentials from the chart Secret
+    set:
+      foundryvtt.username: user
+      foundryvtt.password: pass
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FOUNDRY_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: vtt-foundry-vtt
+                key: username
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FOUNDRY_LICENSE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: vtt-foundry-vtt
+                key: licenseKey
+          any: true
+
+  - it: reads the license key, and no account, when only licenseKey is set
+    set:
+      foundryvtt.licenseKey: AAAA-BBBB
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FOUNDRY_LICENSE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: vtt-foundry-vtt
+                key: licenseKey
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FOUNDRY_USERNAME
+          any: true
+
+  - it: reads everything from an existing Secret with a license key
+    set:
+      foundryvtt.adminPassword: ""
+      foundryvtt.existingSecret: my-foundry
+      foundryvtt.existingLicenseType: licenseKey
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FOUNDRY_LICENSE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: my-foundry
+                key: licenseKey
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FOUNDRY_ADMIN_KEY
+            valueFrom:
+              secretKeyRef:
+                name: my-foundry
+                key: adminPassword
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FOUNDRY_USERNAME
+          any: true
+
+  - it: mounts the chart PVC by default
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: data
+            persistentVolumeClaim:
+              claimName: vtt-foundry-vtt
+  - it: mounts an existing claim
+    set:
+      persistence.existingClaim: foundry-data
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: data
+            persistentVolumeClaim:
+              claimName: foundry-data
+  - it: uses an emptyDir without persistence
+    set:
+      persistence.enabled: false
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: data
+            emptyDir: {}
+
+  - it: runs as non-root with a read-only root filesystem
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
+          value: true
+      - equal:
+          path: spec.template.spec.securityContext.runAsNonRoot
+          value: true
+
+  - it: mounts the S3 credentials when S3 is enabled
+    set:
+      foundryvtt.s3.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: secret-aws
+            secret:
+              secretName: vtt-foundry-vtt-aws
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FOUNDRY_AWS_CONFIG
+            value: /etc/secretaws/aws-credentials.json

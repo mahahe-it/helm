@@ -1,0 +1,81 @@
+suite: deployment
+templates:
+  - deployment.yaml
+  - secret.yaml
+release:
+  name: pve
+chart:
+  appVersion: 1.2.3
+tests:
+  - it: uses the chart appVersion as image tag by default
+    template: deployment.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: prompve/prometheus-pve-exporter:1.2.3
+
+  - it: uses image.tag when set
+    template: deployment.yaml
+    set:
+      image.tag: 3.5.5
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: prompve/prometheus-pve-exporter:3.5.5
+
+  - it: mounts the generated pve.yml
+    template: deployment.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: pve-config
+            mountPath: /etc/pve.yml
+            readOnly: true
+            subPath: pve.yml
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: pve-config
+            secret:
+              secretName: pve-prometheus-pve-exporter
+
+  - it: restarts the pod when the configuration changes
+    template: deployment.yaml
+    asserts:
+      - exists:
+          path: spec.template.metadata.annotations["checksum/config"]
+
+  - it: writes user and password to pve.yml
+    template: secret.yaml
+    set:
+      pve.user: prometheus@pve
+      pve.password: secret
+    asserts:
+      - equal:
+          path: stringData["pve.yml"]
+          value: |-
+            default:
+              user: prometheus@pve
+              password: secret
+              verify_ssl: false
+
+  - it: writes an API token instead of the password
+    template: secret.yaml
+    set:
+      pve.user: prometheus@pve
+      pve.password: unused
+      pve.token_name: exporter
+      pve.token_value: 0000-1111
+      pve.verify_ssl: true
+    asserts:
+      - equal:
+          path: stringData["pve.yml"]
+          value: |-
+            default:
+              user: prometheus@pve
+              token_name: exporter
+              token_value: 0000-1111
+              verify_ssl: true
