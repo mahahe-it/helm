@@ -48,7 +48,7 @@ jobs:
 
       - uses: actions/setup-python@v7.1.0
         with:
-          python-version: "3.13"
+          python-version: "3.15"
 
       - uses: helm/chart-testing-action@v2.9.0
 
@@ -103,7 +103,7 @@ jobs:
       - uses: actions/setup-python@v7.1.0
         if: needs.lint.outputs.changed == 'true'
         with:
-          python-version: "3.13"
+          python-version: "3.15"
 
       - uses: helm/chart-testing-action@v2.9.0
         if: needs.lint.outputs.changed == 'true'
