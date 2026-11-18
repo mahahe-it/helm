@@ -23,11 +23,11 @@ replicaCount: 1
 
 ## @section Image Parameters
 ## @param image.repository DockerHub image repository to use
-## @param image.tag Image tag to use
+## @param image.tag Image tag, defaults to the chart appVersion
 ## @param image.pullPolicy Pull Policy for the image
 image:
   repository: quay.io/prometheus/haproxy-exporter
-  tag: "v0.13.0"
+  tag: ""
   pullPolicy: IfNotPresent
 
 

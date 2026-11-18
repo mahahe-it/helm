@@ -2,7 +2,8 @@ apiVersion: v2
 name: youtrack
 description: A Helm chart to install YouTrack in your Kubernetes Cluster
 version: 1.0.0
-appVersion: "2022.2"
+# renovate: datasource=docker depName=jetbrains/youtrack
+appVersion: "2022.2.55618"
 keywords:
   - youtrack
   - jetbrains

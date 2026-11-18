@@ -60,7 +60,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | Name               | Description                       | Value                                 |
 | ------------------ | --------------------------------- | ------------------------------------- |
 | `image.repository` | DockerHub image repository to use | `quay.io/prometheus/haproxy-exporter` |
-| `image.tag`        | Image tag to use                  | `v0.13.0`                             |
+| `image.tag`        | Image tag, defaults to the chart appVersion | `""` |
 | `image.pullPolicy` | Pull Policy for the image         | `IfNotPresent`                        |
 
 ### Service Parameters

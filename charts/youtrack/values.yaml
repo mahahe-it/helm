@@ -8,11 +8,11 @@ fullnameOverride: ""
 
 ## @section Image Parameters
 ## @param image.repository DockerHub image repository to use
-## @param image.tag Image tag to use
+## @param image.tag Image tag, defaults to the chart appVersion
 ## @param image.pullPolicy Pull Policy for the image
 image:
   repository: jetbrains/youtrack
-  tag: 2022.2.55618
+  tag: ""
   pullPolicy: IfNotPresent
 
 ## @section Service Parameters
