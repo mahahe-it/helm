@@ -2,7 +2,7 @@ apiVersion: v2
 name: foundry-vtt
 description: Foundry Virtual Tabletop
 type: application
-version: 1.0.0
+version: 1.0.1
 # renovate: datasource=docker depName=felddy/foundryvtt
 appVersion: "14.370.0"
 keywords:

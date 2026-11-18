@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/mahahe-it/helm/compare/foundry-vtt-1.0.0...foundry-vtt-1.0.1) (2026-11-18)
+
+
+### Bug Fixes
+
+* **foundry-vtt:** bad annotations indentation in ingress template ([#32](https://github.com/mahahe-it/helm/issues/32)) ([174fa23](https://github.com/mahahe-it/helm/commit/174fa23413e45fb59826baf26fb021c6145ef358))
+
 ## [1.0.0](https://github.com/mahahe-it/helm/compare/foundry-vtt-0.1.7...foundry-vtt-1.0.0) (2026-11-18)
 
 
