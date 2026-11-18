@@ -73,7 +73,7 @@ jobs:
         run: |
           curl -fsSL "https://github.com/norwoodj/helm-docs/releases/download/v${HELM_DOCS_VERSION}/helm-docs_${HELM_DOCS_VERSION}_Linux_x86_64.tar.gz" \
             | tar -xz -C "$RUNNER_TEMP" helm-docs
-          "$RUNNER_TEMP/helm-docs" --chart-search-root=charts
+          "$RUNNER_TEMP/helm-docs" --chart-search-root=charts --sort-values-order=file
           read -ra charts <<< "$CHARTS"
           git diff --exit-code -- "${charts[@]/%//README.md}" \
             || { echo "::error::Chart READMEs are stale: run 'just docs' and commit"; exit 1; }

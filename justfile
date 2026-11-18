@@ -75,7 +75,7 @@ unittest:
 
 # Regenerate the charts' README.md
 docs:
-    {{ tb }} helm-docs --chart-search-root=charts
+    {{ tb }} helm-docs --chart-search-root=charts --sort-values-order=file
 
 # Install changed charts (or --all) in a throwaway kind cluster
 test *args:
