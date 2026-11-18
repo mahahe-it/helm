@@ -1,6 +1,6 @@
 {
-  "charts/foundry-vtt": "0.1.7",
-  "charts/prometheus-haproxy-exporter": "0.1.8",
-  "charts/prometheus-pve-exporter": "0.1.18",
-  "charts/youtrack": "0.1.12"
+  "charts/foundry-vtt": "1.0.0",
+  "charts/prometheus-haproxy-exporter": "1.0.0",
+  "charts/prometheus-pve-exporter": "1.0.0",
+  "charts/youtrack": "1.0.0"
 }
