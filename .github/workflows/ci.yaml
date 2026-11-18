@@ -37,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.list-changed.outputs.changed }}
+      charts: ${{ steps.list-changed.outputs.charts }}
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -108,28 +109,44 @@ jobs:
       - uses: helm/chart-testing-action@v2.9.0
         if: needs.lint.outputs.changed == 'true'
 
-      # foundry-vtt needs a real license to start; the secret is absent on fork PRs.
-      # FOUNDRY_INSTALL_TEST=false skips it when the default image cannot start.
-      - name: Foundry test values
-        id: foundry
+      # Install exactly the charts lint found changed. Letting ct install work
+      # it out again would also pick foundry-vtt, whose test values are
+      # written into the checkout below and make it look modified.
+      # foundry-vtt needs a real license to start: its secret is absent on fork
+      # PRs, and FOUNDRY_INSTALL_TEST=false skips it when the default image
+      # cannot start.
+      - name: Charts to install
+        id: charts
         if: needs.lint.outputs.changed == 'true'
         env:
+          CHARTS: ${{ needs.lint.outputs.charts }}
           FOUNDRY_INSTALL_TEST: "true"
           SECRET_VALUES: ${{ secrets.FOUNDRY_SECRET_VALUES }}
         run: |
-          if [[ "$FOUNDRY_INSTALL_TEST" == "true" && -n "$SECRET_VALUES" ]]; then
-            echo "$SECRET_VALUES" | base64 -d > charts/foundry-vtt/ci/test-values.yaml
-          else
-            echo "exclude=--excluded-charts foundry-vtt" >> "$GITHUB_OUTPUT"
-          fi
+          read -ra charts <<< "$CHARTS"
+          install=()
+          for chart in "${charts[@]}"; do
+            if [[ "$chart" == charts/foundry-vtt ]]; then
+              if [[ "$FOUNDRY_INSTALL_TEST" != "true" || -z "$SECRET_VALUES" ]]; then
+                echo "Skipping foundry-vtt: no license for the install test"
+                continue
+              fi
+              echo "$SECRET_VALUES" | base64 -d > charts/foundry-vtt/ci/test-values.yaml
+            fi
+            install+=("$chart")
+          done
+          echo "Installing: ${install[*]:-nothing}"
+          echo "list=$(IFS=,; echo "${install[*]}")" >> "$GITHUB_OUTPUT"
 
       - uses: helm/kind-action@v1.15.2
-        if: needs.lint.outputs.changed == 'true'
+        if: steps.charts.outputs.list != ''
 
       - name: Install
-        if: needs.lint.outputs.changed == 'true'
-        run: ct install --config .github/ct/ct.yaml ${{ steps.foundry.outputs.exclude }}
+        if: steps.charts.outputs.list != ''
+        env:
+          CHARTS: ${{ steps.charts.outputs.list }}
+        run: ct install --config .github/ct/ct.yaml --charts "$CHARTS"
 
       - name: Nothing to install
-        if: needs.lint.outputs.changed != 'true'
-        run: echo "No chart changed"
+        if: steps.charts.outputs.list == ''
+        run: echo "No chart to install"
