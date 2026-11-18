@@ -1,0 +1,6 @@
+# Artifact Hub metadata for the mahahe-foundry-vtt repository of the mahahe-it
+# organization (oci://ghcr.io/mahahe-it/helm/foundry-vtt).
+repositoryID: 63c7ee06-73a0-436c-9c9a-3cb3bd5c75a6
+owners:
+  - name: MaHaHe DevOps
+    email: devops@mahahe.it

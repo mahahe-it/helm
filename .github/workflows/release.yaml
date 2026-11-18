@@ -2,6 +2,8 @@ name: Release
 on:
   push:
     branches: [main]
+  # Run by hand to push only the Artifact Hub metadata of every chart.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -19,6 +21,7 @@ jobs:
     # Opens/updates the release PR; on its merge, tags and creates the
     # GitHub releases. The app token makes the release PR trigger CI.
     name: Release PR
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
       releases_created: ${{ steps.release.outputs.releases_created }}
@@ -82,18 +85,9 @@ jobs:
           helm push "dist/$name-$version.tgz" "oci://$OCI_REPO"
 
       # Artifact Hub reads repository metadata from the artifacthub.io tag of
-      # each OCI repository: a chart-specific file wins over the default one.
+      # each OCI repository.
       - name: Push Artifact Hub metadata
-        env:
-          NAME: ${{ steps.chart.outputs.name }}
-        run: |
-          src=.github/artifacthub/$NAME.yml
-          [[ -f "$src" ]] || src=.github/artifacthub/default.yml
-          mkdir -p "$RUNNER_TEMP/ah" && cp "$src" "$RUNNER_TEMP/ah/artifacthub-repo.yml"
-          cd "$RUNNER_TEMP/ah"
-          oras push "$OCI_REPO/$NAME:artifacthub.io" \
-            --config /dev/null:application/vnd.cncf.artifacthub.config.v1+yaml \
-            artifacthub-repo.yml:application/vnd.cncf.artifacthub.repository-metadata.layer.v1.yaml
+        run: .github/artifacthub/push.sh "${{ steps.chart.outputs.name }}"
 
       - name: Attach chart to the GitHub release
         env:
@@ -101,3 +95,25 @@ jobs:
           NAME: ${{ steps.chart.outputs.name }}
           VERSION: ${{ steps.chart.outputs.version }}
         run: gh release upload "$NAME-$VERSION" "dist/$NAME-$VERSION.tgz" --clobber
+
+  artifacthub-metadata:
+    name: Artifact Hub metadata
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write   # push the artifacthub.io tags to GHCR
+    env:
+      OCI_REPO: ghcr.io/${{ github.repository_owner }}/helm
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: oras-project/setup-oras@v2.0.3
+
+      - name: Log in to GHCR
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$TOKEN" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Push Artifact Hub metadata
+        run: .github/artifacthub/push.sh $(yq -N '.name' charts/*/Chart.yaml)

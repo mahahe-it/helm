@@ -1,0 +1,6 @@
+# Artifact Hub metadata for the youtrack repository of the mahahe-it
+# organization (oci://ghcr.io/mahahe-it/helm/youtrack).
+repositoryID: 3b66d7fc-e656-4785-a135-7aaf040dc641
+owners:
+  - name: MaHaHe DevOps
+    email: devops@mahahe.it

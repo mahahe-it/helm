@@ -1,4 +1,4 @@
-[![ArtifactHub](https://img.shields.io/static/v1?label=ArtifactHub&message=Organization&labelColor=EBEBEB&color=417598&logo=ArtifactHub)](https://artifacthub.io/packages/search?org=mahahe&sort=relevance&page=1)
+[![ArtifactHub](https://img.shields.io/static/v1?label=ArtifactHub&message=Organization&labelColor=EBEBEB&color=417598&logo=ArtifactHub)](https://artifacthub.io/packages/search?org=mahahe-it&sort=relevance&page=1)
 [![CI](https://github.com/mahahe-it/helm/actions/workflows/ci.yaml/badge.svg)](https://github.com/mahahe-it/helm/actions/workflows/ci.yaml)
 [![Release](https://github.com/mahahe-it/helm/actions/workflows/release.yaml/badge.svg)](https://github.com/mahahe-it/helm/actions/workflows/release.yaml)
 

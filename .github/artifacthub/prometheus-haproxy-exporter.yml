@@ -1,0 +1,6 @@
+# Artifact Hub metadata for the prometheus-haproxy-exporter repository of the mahahe-it
+# organization (oci://ghcr.io/mahahe-it/helm/prometheus-haproxy-exporter).
+repositoryID: 970491a8-1b63-4637-b600-d31d41182392
+owners:
+  - name: MaHaHe DevOps
+    email: devops@mahahe.it

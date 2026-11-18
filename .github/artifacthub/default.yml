@@ -1,7 +1,8 @@
-# Artifact Hub repository metadata, pushed by the release workflow as the
-# artifacthub.io tag of each chart's OCI repository. Once a chart is added on
-# Artifact Hub, copy this to <chart>.yml and set its repositoryID to get the
-# Verified Publisher badge.
+# Artifact Hub repository metadata, pushed by .github/artifacthub/push.sh as the
+# artifacthub.io tag of each chart's OCI repository. For a new chart: add it on
+# Artifact Hub (organization mahahe-it), copy this to <chart>.yml with its
+# repositoryID for the Verified Publisher badge, then run the Release workflow
+# by hand (workflow_dispatch) to push the metadata without a release.
 owners:
   - name: MaHaHe DevOps
     email: devops@mahahe.it
