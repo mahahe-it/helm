@@ -1,0 +1,6 @@
+# Artifact Hub metadata for the mahahe-website repository of the mahahe-it
+# organization (oci://ghcr.io/mahahe-it/helm/mahahe-website).
+repositoryID: 026ee743-6e39-4305-9414-4957e5ed1a7b
+owners:
+  - name: MaHaHe DevOps
+    email: devops@mahahe.it
