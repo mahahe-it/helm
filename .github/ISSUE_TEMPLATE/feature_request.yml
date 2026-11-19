@@ -1,6 +1,6 @@
 name: Feature request
 description: A new option for a chart, or a new chart
-labels: ["Enhancement"]
+labels: ["type: feature"]
 body:
   - type: dropdown
     id: chart

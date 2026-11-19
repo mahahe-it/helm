@@ -1,6 +1,6 @@
 name: Bug report
 description: A chart does not install, renders wrong manifests or the app misbehaves because of the chart
-labels: ["Bug"]
+labels: ["type: bug"]
 body:
   - type: dropdown
     id: chart
