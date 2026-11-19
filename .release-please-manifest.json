@@ -3,5 +3,5 @@
   "charts/mahahe-website": "1.0.0",
   "charts/prometheus-haproxy-exporter": "1.0.1",
   "charts/prometheus-pve-exporter": "1.0.1",
-  "charts/youtrack": "1.0.0"
+  "charts/youtrack": "2.0.0"
 }
