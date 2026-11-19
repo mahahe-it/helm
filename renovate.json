@@ -3,6 +3,7 @@
   "extends": ["config:recommended", ":semanticCommits"],
   "timezone": "Europe/Rome",
   "labels": ["dependencies"],
+  "prHourlyLimit": 0,
   "customManagers": [
     {
       "customType": "regex",
@@ -36,6 +37,11 @@
       "semanticCommitType": "ci",
       "semanticCommitScope": "deps",
       "groupName": "toolbox and CI"
+    },
+    {
+      "description": "Deprecated chart: no more updates, they would release it again",
+      "matchFileNames": ["charts/prometheus-haproxy-exporter/**"],
+      "enabled": false
     }
   ]
 }
