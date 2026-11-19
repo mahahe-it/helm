@@ -4,22 +4,20 @@
 # -- Number of exporter pods
 # @section -- Common Parameters
 replicaCount: 1
-
-rbac:
-  # -- Create the Role and RoleBinding for the exporter
-  # @section -- Common Parameters
-  create: true
-  # -- Create a PodSecurityPolicy (removed in Kubernetes 1.25)
-  # @section -- Common Parameters
-  pspEnabled: false
+# -- Partially override the fullname (keeps the release name)
+# @section -- Common Parameters
+nameOverride: ""
+# -- Fully override the fullname
+# @section -- Common Parameters
+fullnameOverride: ""
 
 serviceAccount:
-  # -- Create a ServiceAccount
+  # -- Create a ServiceAccount (the exporter does not use the Kubernetes API, its token is not mounted)
   # @section -- Common Parameters
   create: true
-  # -- ServiceAccount name; generated from the fullname template when empty and `create` is true
+  # -- ServiceAccount name; generated from the fullname when empty and `create` is true
   # @section -- Common Parameters
-  name:
+  name: ""
 
 image:
   # -- Image repository
@@ -32,6 +30,14 @@ image:
   # @section -- Image Parameters
   pullPolicy: IfNotPresent
 
+# -- Pull secrets for a private registry
+# @section -- Image Parameters
+imagePullSecrets: []
+
+# -- Extra exporter flags, e.g. `[--no-collector.config, --log.level=debug]`
+# @section -- Common Parameters
+extraArgs: []
+
 service:
   # -- Service type
   # @section -- Service Parameters
@@ -40,51 +46,86 @@ service:
   # @section -- Service Parameters
   port: 9221
 
-# Ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
-ingress:
-  # -- Create an Ingress for the exporter
-  # @section -- Ingress Parameters
-  enabled: false
-  # -- Ingress annotations, e.g. for cert-manager
-  # @section -- Ingress Parameters
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  # -- Path served by the Ingress
-  # @section -- Ingress Parameters
-  path: /
-  # -- Ingress host names (list of strings)
-  # @section -- Ingress Parameters
-  hosts:
-    # - chart-example.local
-  # -- Ingress TLS configuration
-  # @section -- Ingress Parameters
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+# -- Host names routed to the exporter by the Ingress and the HTTPRoute; required when either is enabled.
+# Upstream advises against exposing the exporter to public networks.
+# @section -- Routing Parameters
+hostnames: []
 
-# Connection to Proxmox VE, stored in a Secret as the exporter's pve.yml.
+ingress:
+  # -- Create an Ingress
+  # @section -- Routing Parameters
+  enabled: false
+  # -- IngressClass name; empty uses the cluster default
+  # @section -- Routing Parameters
+  className: ""
+  # -- Ingress annotations, e.g. `cert-manager.io/cluster-issuer`
+  # @section -- Routing Parameters
+  annotations: {}
+  # -- TLS configuration, e.g. `[{secretName: pve-exporter-tls, hosts: [pve-exporter.example.com]}]`
+  # @section -- Routing Parameters
+  tls: []
+
+# Gateway API, the alternative to the Ingress: needs the Gateway API CRDs and
+# a Gateway to attach to. TLS is configured on the Gateway listener.
+httpRoute:
+  # -- Create an HTTPRoute (gateway.networking.k8s.io/v1)
+  # @section -- Routing Parameters
+  enabled: false
+  # -- Gateways the route attaches to, e.g. `[{name: public, namespace: gateway, sectionName: https}]`; required when enabled
+  # @section -- Routing Parameters
+  parentRefs: []
+  # -- HTTPRoute annotations
+  # @section -- Routing Parameters
+  annotations: {}
+
+# Connection to Proxmox VE, written to a Secret as the exporter's pve.yml
+# (module `default`). Use a read-only user (PVEAuditor role).
 # Ref: https://github.com/prometheus-pve/prometheus-pve-exporter#authentication
 pve:
-  # -- Proxmox VE node scraped by the ServiceMonitor (`target` parameter)
-  # @section -- PVE Parameters
-  target: []
   # -- Proxmox VE user, e.g. `prometheus@pve`
   # @section -- PVE Parameters
   user: root@pam
   # -- Password of `user`; ignored when `token_name` is set
   # @section -- PVE Parameters
-  password:
-  # token_name: API token name, used instead of the password when set
-  # token_value: API token secret
+  password: ""
+  # -- API token name, used instead of the password when set
+  # @section -- PVE Parameters
+  token_name: ""
+  # -- API token secret
+  # @section -- PVE Parameters
+  token_value: ""
   # -- Verify the TLS certificate of the Proxmox VE API
   # @section -- PVE Parameters
   verify_ssl: false
+  # -- Existing Secret with a `pve.yml` key; when set, the values above are ignored and no Secret is created
+  # @section -- PVE Parameters
+  existingSecret: ""
+
+# -- Pod security context: the v3 image runs as prometheus (101:101)
+# @section -- Security Parameters
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 101
+  runAsGroup: 101
+  seccompProfile:
+    type: RuntimeDefault
+
+# -- Container security context: read-only root filesystem, /tmp is an emptyDir
+# @section -- Security Parameters
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
 
 # -- Resources of the exporter container, e.g. `{limits: {cpu: 100m, memory: 128Mi}}`
 # @section -- Advanced Parameters
 resources: {}
+
+# -- Extra pod annotations
+# @section -- Advanced Parameters
+podAnnotations: {}
 
 # -- Node selector for the exporter pods
 # @section -- Advanced Parameters
@@ -98,25 +139,30 @@ tolerations: []
 # @section -- Advanced Parameters
 affinity: {}
 
-# -- Extra labels added to the ServiceMonitor
-# @section -- Advanced Parameters
-extraLabels: {}
-
 # Prometheus Operator ServiceMonitor, created only when its CRD is installed.
 # Ref: https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.Endpoint
 serviceMonitor:
   # -- Create a ServiceMonitor for the Prometheus Operator
   # @section -- ServiceMonitor Parameters
   enabled: false
+  # -- Proxmox VE hosts to scrape, one endpoint each (`target` parameter, also the `instance` label); required when enabled
+  # @section -- ServiceMonitor Parameters
+  targets: []
+  # -- Other scrape parameters. For large clusters upstream advises separate cluster and node scrapes
+  # @section -- ServiceMonitor Parameters
+  params:
+    module: [default]
+    cluster: ["1"]
+    node: ["1"]
   # -- Namespace of the ServiceMonitor, defaults to the release namespace
   # @section -- ServiceMonitor Parameters
   namespace: ""
   # -- Scrape interval
   # @section -- ServiceMonitor Parameters
   interval: 30s
-  # -- Extra labels for the ServiceMonitor, e.g. the one your Prometheus selects on
-  # @section -- ServiceMonitor Parameters
-  labels: {}
   # -- Scrape timeout
   # @section -- ServiceMonitor Parameters
   timeout: 10s
+  # -- Extra labels for the ServiceMonitor, e.g. `release` for kube-prometheus-stack
+  # @section -- ServiceMonitor Parameters
+  labels: {}

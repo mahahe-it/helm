@@ -1,15 +1,13 @@
-{{/* vim: set filetype=mustache: */}}
 {{/*
-Expand the name of the chart.
+Chart name, overridable with nameOverride.
 */}}
 {{- define "prometheus-pve-exporter.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
-Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
+Fully qualified app name: the release name alone when it already contains the
+chart name. Truncated at 63 chars (DNS label limit).
 */}}
 {{- define "prometheus-pve-exporter.fullname" -}}
 {{- if .Values.fullnameOverride -}}
@@ -24,42 +22,46 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 
-{{/*
-Create chart name and version as used by the chart label.
-*/}}
 {{- define "prometheus-pve-exporter.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
-Create the name of the service account to use
+Standard labels.
 */}}
-{{- define "prometheus-pve-exporter.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-    {{ default (include "prometheus-pve-exporter.fullname" .) .Values.serviceAccount.name }}
-{{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
-{{- end -}}
+{{- define "prometheus-pve-exporter.labels" -}}
+helm.sh/chart: {{ include "prometheus-pve-exporter.chart" . }}
+app.kubernetes.io/name: {{ include "prometheus-pve-exporter.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{/*
-Return the appropriate apiVersion for rbac.
+Selector labels: immutable on the Deployment, kept as in 1.x.
 */}}
-{{- define "rbac.apiVersion" -}}
-{{- if .Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
-{{- print "rbac.authorization.k8s.io/v1" -}}
+{{- define "prometheus-pve-exporter.selectorLabels" -}}
+app: {{ include "prometheus-pve-exporter.name" . }}
+release: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "prometheus-pve-exporter.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+{{- default (include "prometheus-pve-exporter.fullname" .) .Values.serviceAccount.name -}}
 {{- else -}}
-{{- print "rbac.authorization.k8s.io/v1beta1" -}}
+{{- default "default" .Values.serviceAccount.name -}}
 {{- end -}}
 {{- end -}}
 
-{{- define "labels.standard" -}}
-app: {{ template "prometheus-pve-exporter.name" . }}
-heritage: {{ .Release.Service | quote }}
-release: {{ .Release.Name | quote }}
-chart: {{ template "chartref" . }}
+{{- define "prometheus-pve-exporter.secretName" -}}
+{{- .Values.pve.existingSecret | default (include "prometheus-pve-exporter.fullname" .) -}}
 {{- end -}}
 
-{{- define "chartref" -}}
-  {{- replace "+" "_" .Chart.Version | printf "%s-%s" .Chart.Name -}}
+{{/*
+Fail when the Ingress or the HTTPRoute has no host to route.
+*/}}
+{{- define "prometheus-pve-exporter.requireHostnames" -}}
+{{- if not .Values.hostnames -}}
+{{- fail "hostnames needs at least one host for the Ingress or the HTTPRoute" -}}
+{{- end -}}
 {{- end -}}

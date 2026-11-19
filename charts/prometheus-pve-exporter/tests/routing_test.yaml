@@ -1,0 +1,115 @@
+suite: routing
+templates:
+  - ingress.yaml
+  - httproute.yaml
+release:
+  name: yt
+tests:
+  - it: creates neither an Ingress nor an HTTPRoute by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: requires host names for the Ingress
+    template: ingress.yaml
+    set:
+      ingress.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: hostnames needs at least one host for the Ingress or the HTTPRoute
+
+  - it: routes every host name to the service port through the Ingress
+    template: ingress.yaml
+    set:
+      hostnames: [pve-exporter.example.com, metrics.example.com]
+      ingress.enabled: true
+      ingress.className: nginx
+    asserts:
+      - isKind:
+          of: Ingress
+      - equal:
+          path: spec.ingressClassName
+          value: nginx
+      - lengthEqual:
+          path: spec.rules
+          count: 2
+      - equal:
+          path: spec.rules[1].host
+          value: metrics.example.com
+      - equal:
+          path: spec.rules[0].http.paths[0]
+          value:
+            path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: yt-prometheus-pve-exporter
+                port:
+                  number: 9221
+      - notExists:
+          path: spec.tls
+
+  - it: adds Ingress TLS and annotations
+    template: ingress.yaml
+    set:
+      hostnames: [pve-exporter.example.com]
+      ingress.enabled: true
+      ingress.annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
+      ingress.tls:
+        - secretName: pve-exporter-tls
+          hosts: [pve-exporter.example.com]
+    asserts:
+      - equal:
+          path: metadata.annotations["cert-manager.io/cluster-issuer"]
+          value: letsencrypt
+      - equal:
+          path: spec.tls[0].secretName
+          value: pve-exporter-tls
+
+  - it: requires a Gateway for the HTTPRoute
+    template: httproute.yaml
+    set:
+      hostnames: [pve-exporter.example.com]
+      httpRoute.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: httpRoute.parentRefs needs at least one Gateway
+
+  - it: requires host names for the HTTPRoute
+    template: httproute.yaml
+    set:
+      httpRoute.enabled: true
+      httpRoute.parentRefs: [{name: public}]
+    asserts:
+      - failedTemplate:
+          errorMessage: hostnames needs at least one host for the Ingress or the HTTPRoute
+
+  - it: attaches the HTTPRoute to the Gateway for every host name
+    template: httproute.yaml
+    set:
+      hostnames: [pve-exporter.example.com]
+      httpRoute.enabled: true
+      httpRoute.parentRefs:
+        - name: public
+          namespace: gateway
+          sectionName: https
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - isAPIVersion:
+          of: gateway.networking.k8s.io/v1
+      - equal:
+          path: spec.parentRefs[0]
+          value:
+            name: public
+            namespace: gateway
+            sectionName: https
+      - equal:
+          path: spec.hostnames
+          value: [pve-exporter.example.com]
+      - equal:
+          path: spec.rules[0].backendRefs[0]
+          value:
+            name: yt-prometheus-pve-exporter
+            port: 9221

@@ -16,31 +16,75 @@ tests:
   - it: needs the Prometheus Operator CRD
     set:
       serviceMonitor.enabled: true
+      serviceMonitor.targets: [pve1.example.com]
     asserts:
       - hasDocuments:
           count: 0
 
-  - it: scrapes /pve on the service port
+  - it: needs at least one Proxmox VE target
+    capabilities:
+      apiVersions:
+        - monitoring.coreos.com/v1
+    set:
+      serviceMonitor.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: serviceMonitor.targets needs at least one Proxmox VE host
+
+  - it: scrapes /pve once per target, labelled with the target
     capabilities:
       apiVersions:
         - monitoring.coreos.com/v1
     set:
       serviceMonitor.enabled: true
       serviceMonitor.namespace: prometheus
-      serviceMonitor.labels:
-        prometheus: main
+      serviceMonitor.targets: [pve1.example.com, pve2.example.com]
     asserts:
       - isKind:
           of: ServiceMonitor
       - equal:
           path: metadata.namespace
           value: prometheus
+      - lengthEqual:
+          path: spec.endpoints
+          count: 2
       - equal:
-          path: metadata.labels.prometheus
-          value: main
+          path: spec.endpoints[1]
+          value:
+            port: http
+            path: /pve
+            interval: 30s
+            scrapeTimeout: 10s
+            params:
+              target: [pve2.example.com]
+              module: [default]
+              cluster: ["1"]
+              node: ["1"]
+            relabelings:
+              - targetLabel: instance
+                replacement: pve2.example.com
       - equal:
-          path: spec.endpoints[0].path
-          value: /pve
+          path: spec.namespaceSelector.matchNames
+          value: [monitoring]
       - equal:
-          path: spec.endpoints[0].targetPort
-          value: 9221
+          path: spec.selector.matchLabels
+          value:
+            app: prometheus-pve-exporter
+            release: pve
+
+  - it: lets serviceMonitor.labels set release without a duplicate key
+    capabilities:
+      apiVersions:
+        - monitoring.coreos.com/v1
+    set:
+      serviceMonitor.enabled: true
+      serviceMonitor.targets: [pve1.example.com]
+      serviceMonitor.labels:
+        release: kube-prometheus-stack
+    asserts:
+      - equal:
+          path: metadata.labels.release
+          value: kube-prometheus-stack
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: prometheus-pve-exporter
