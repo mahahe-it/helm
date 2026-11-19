@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/mahahe-it/helm/compare/foundry-vtt-1.0.2...foundry-vtt-1.1.0) (2026-11-19)
+
+
+### Features
+
+* **foundry-vtt:** optional Gateway API HTTPRoute ([#89](https://github.com/mahahe-it/helm/issues/89)) ([af672f6](https://github.com/mahahe-it/helm/commit/af672f6115c5793bc61da6d03015d3651745ef57))
+
 ## [1.0.2](https://github.com/mahahe-it/helm/compare/foundry-vtt-1.0.1...foundry-vtt-1.0.2) (2026-11-18)
 
 

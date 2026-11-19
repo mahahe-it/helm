@@ -1,5 +1,5 @@
 {
-  "charts/foundry-vtt": "1.0.2",
+  "charts/foundry-vtt": "1.1.0",
   "charts/mahahe-website": "1.0.0",
   "charts/prometheus-haproxy-exporter": "2.0.0",
   "charts/prometheus-pve-exporter": "2.0.0",
