@@ -29,6 +29,42 @@ Credentials can come from the values (stored in a Secret created by the chart) o
 
 The [Parameters](#parameters) section lists everything that can be configured.
 
+## Exposing Foundry
+
+Route the hosts in `hostnames` with an Ingress or, with the Gateway API, an
+HTTPRoute; TLS ends there. Set `foundryvtt.hostname` to the public host as well,
+so Foundry shows the right invitation links. Foundry uses WebSockets, which
+both the Ingress controllers and the Gateway API implementations in common use
+pass through.
+
+```yaml
+# Ingress, with cert-manager
+hostnames:
+  - vtt.example.com
+ingress:
+  enabled: true
+  className: nginx
+  tls: true  # secret <fullname>-tls, for every host
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+```
+
+```yaml
+# Gateway API
+hostnames:
+  - vtt.example.com
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: public
+      namespace: gateway
+      sectionName: https
+```
+
+`ingress.hostname` still works when `hostnames` is empty.
+`ingress.configurationSnippet` is specific to ingress-nginx and has no
+HTTPRoute equivalent.
+
 ## Uninstalling the Chart
 
 ```console
@@ -154,11 +190,15 @@ Foundry VTT moves from v10 to v14. Back up `/data` before upgrading: Foundry mig
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| hostnames | list | `[]` | Host names routed to Foundry by the Ingress and the HTTPRoute. When empty, `ingress.hostname` is used |
 | ingress.enabled | bool | `false` | Enable Ingress creations |
-| ingress.hostname | string | `"foundry.domain.com"` | Hostname for FoundryVTT |
+| ingress.hostname | string | `"foundry.domain.com"` | Single host name, used when `hostnames` is empty (kept for compatibility, prefer `hostnames`) |
 | ingress.annotations | object | `{}` | Ingress Annotations, useful for TLS |
 | ingress.path | string | `"/"` | FoundryVTT Path |
 | ingress.pathType | string | `"Prefix"` | Type of Path |
 | ingress.configurationSnippet | string | `""` | Extra NGINX Configuration to add as Annotation |
 | ingress.tls | bool | `false` | Enable or Disable TLS |
 | ingress.className | string | `""` | Optional Ingress class name |
+| httpRoute.enabled | bool | `false` | Create an HTTPRoute (gateway.networking.k8s.io/v1) |
+| httpRoute.parentRefs | list | `[]` | Gateways the route attaches to, e.g. `[{name: public, namespace: gateway, sectionName: https}]`; required when enabled |
+| httpRoute.annotations | object | `{}` | HTTPRoute annotations |

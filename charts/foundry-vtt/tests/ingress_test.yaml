@@ -73,3 +73,44 @@ tests:
     asserts:
       - notExists:
           path: spec.ingressClassName
+
+  - it: routes every host in hostnames, with TLS for all of them
+    set:
+      hostnames: [vtt.example.com, foundry.example.com]
+      ingress.enabled: true
+      ingress.hostname: ignored.example.com
+      ingress.tls: true
+    asserts:
+      - lengthEqual:
+          path: spec.rules
+          count: 2
+      - equal:
+          path: spec.rules[1].host
+          value: foundry.example.com
+      - equal:
+          path: spec.rules[1].http.paths[0]
+          value:
+            pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: vtt-foundry-vtt
+                port:
+                  number: 80
+      - equal:
+          path: spec.tls[0]
+          value:
+            hosts: [vtt.example.com, foundry.example.com]
+            secretName: vtt-foundry-vtt-tls
+
+  - it: renders the nginx configuration snippet with templates
+    set:
+      ingress.enabled: true
+      foundryvtt.hostname: vtt.example.com
+      ingress.configurationSnippet: |
+        more_set_input_headers "X-Forwarded-Host: {{ .Values.foundryvtt.hostname }}";
+    asserts:
+      - equal:
+          path: metadata.annotations["nginx.ingress.kubernetes.io/configuration-snippet"]
+          value: |
+            more_set_input_headers "X-Forwarded-Host: vtt.example.com";

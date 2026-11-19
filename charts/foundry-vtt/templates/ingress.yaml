@@ -1,4 +1,6 @@
 {{- if eq .Values.ingress.enabled true }}
+{{- $hosts := include "foundry-vtt.hostnames" . | fromYamlArray }}
+{{- $fullName := include "foundry-vtt.fullname" . }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -11,7 +13,7 @@ metadata:
   annotations:
 {{- if .Values.ingress.configurationSnippet }}
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      {{- template "configurationSnippet" . }}
+      {{- tpl .Values.ingress.configurationSnippet . | nindent 6 }}
 {{- end }}
 {{- if .Values.ingress.annotations }}
   {{- toYaml .Values.ingress.annotations | nindent 4 }}
@@ -22,20 +24,22 @@ spec:
   ingressClassName: {{ . }}
 {{- end }}
   rules:
-    - host: {{ .Values.ingress.hostname }}
+    {{- range $hosts }}
+    - host: {{ . | quote }}
       http:
         paths:
-          - pathType: {{ .Values.ingress.pathType }}
-            path: {{ .Values.ingress.path }}
+          - pathType: {{ $.Values.ingress.pathType }}
+            path: {{ $.Values.ingress.path }}
             backend:
               service:
-                name: {{ template "foundry-vtt.fullname" . }}
+                name: {{ $fullName }}
                 port:
-                  number: {{ .Values.service.port }}
+                  number: {{ $.Values.service.port }}
+    {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
     - hosts:
-        - {{ .Values.ingress.hostname }}
-      secretName: {{ template "foundry-vtt.fullname" . }}-tls
+        {{- toYaml $hosts | nindent 8 }}
+      secretName: {{ $fullName }}-tls
   {{- end }}
 {{- end }}

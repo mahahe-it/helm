@@ -91,3 +91,15 @@ eks.amazonaws.com/role-arn: arn:aws:iam::{{ $accountId }}:role/{{ . }}
 {{- end }}
 {{- end }}
 {{- end -}}
+
+{{/*
+Host names for the Ingress and the HTTPRoute: hostnames, or ingress.hostname
+as before 1.1.0.
+*/}}
+{{- define "foundry-vtt.hostnames" -}}
+{{- if .Values.hostnames -}}
+{{- toYaml .Values.hostnames -}}
+{{- else if .Values.ingress.hostname -}}
+{{- list .Values.ingress.hostname | toYaml -}}
+{{- end -}}
+{{- end -}}

@@ -302,11 +302,15 @@ container:
   # @section -- Extra Container Configurations
   verbose: false
 
+# -- Host names routed to Foundry by the Ingress and the HTTPRoute. When empty, `ingress.hostname` is used
+# @section -- Ingress Parameters
+hostnames: []
+
 ingress:
   # -- Enable Ingress creations
   # @section -- Ingress Parameters
   enabled: false
-  # -- Hostname for FoundryVTT
+  # -- Single host name, used when `hostnames` is empty (kept for compatibility, prefer `hostnames`)
   # @section -- Ingress Parameters
   hostname: foundry.domain.com
   # -- Ingress Annotations, useful for TLS
@@ -331,3 +335,16 @@ ingress:
   # -- Optional Ingress class name
   # @section -- Ingress Parameters
   className: ""
+
+# Gateway API, the alternative to the Ingress: needs the Gateway API CRDs and
+# a Gateway to attach to. TLS is configured on the Gateway listener.
+httpRoute:
+  # -- Create an HTTPRoute (gateway.networking.k8s.io/v1)
+  # @section -- Ingress Parameters
+  enabled: false
+  # -- Gateways the route attaches to, e.g. `[{name: public, namespace: gateway, sectionName: https}]`; required when enabled
+  # @section -- Ingress Parameters
+  parentRefs: []
+  # -- HTTPRoute annotations
+  # @section -- Ingress Parameters
+  annotations: {}
