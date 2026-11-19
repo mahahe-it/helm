@@ -1,9 +1,10 @@
 apiVersion: v2
 name: prometheus-pve-exporter
-description: A Helm chart to export the metrics from pve in Prometheus format.
+description: Prometheus exporter for Proxmox VE metrics (prometheus-pve-exporter)
+kubeVersion: ">=1.25.0-0"
 version: 1.0.1
 # renovate: datasource=docker depName=prompve/prometheus-pve-exporter
-appVersion: "2.3.1"
+appVersion: "3.12.0"
 keywords:
   - pve-exporter
 annotations:
@@ -20,4 +21,4 @@ maintainers:
 home: https://github.com/prometheus-pve/prometheus-pve-exporter
 sources:
   - https://github.com/prometheus-pve/prometheus-pve-exporter
-  - https://github.com/mahahe-it/helm/tree/master/charts/
+  - https://github.com/mahahe-it/helm/tree/main/charts/prometheus-pve-exporter

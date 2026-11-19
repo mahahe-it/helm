@@ -1,35 +1,40 @@
-{{- if and ( .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" ) ( .Values.serviceMonitor.enabled ) }}
+{{- if and (.Capabilities.APIVersions.Has "monitoring.coreos.com/v1") .Values.serviceMonitor.enabled }}
+{{- if not .Values.serviceMonitor.targets }}
+{{- fail "serviceMonitor.targets needs at least one Proxmox VE host" }}
+{{- end }}
+{{- $labels := merge (deepCopy .Values.serviceMonitor.labels) (include "prometheus-pve-exporter.labels" . | fromYaml) }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ template "prometheus-pve-exporter.fullname" . }}
+  name: {{ include "prometheus-pve-exporter.fullname" . }}
   namespace: {{ .Values.serviceMonitor.namespace | default .Release.Namespace | quote }}
   labels:
-{{ include "labels.standard" . | indent 4 }}
-    {{- range $key, $value := .Values.extraLabels }}
-    {{ $key }}: {{ $value | quote }}
-    {{- end }}
-    {{- range $key, $value := .Values.serviceMonitor.labels }}
-    {{ $key }}: {{ $value | quote }}
-    {{- end }}
+    {{- toYaml $labels | nindent 4 }}
 spec:
   endpoints:
-  - targetPort: {{ .Values.service.port }}
-{{- if .Values.serviceMonitor.interval }}
-    interval: {{ .Values.serviceMonitor.interval }}
-{{- end }}
-    path: /pve
-    params:
-      target: {{ .Values.pve.target }}
-{{- if .Values.serviceMonitor.timeout }}
-    scrapeTimeout: {{ .Values.serviceMonitor.timeout }}
-{{- end }}
-  jobLabel: {{ template "prometheus-pve-exporter.fullname" . }}
+    {{- range .Values.serviceMonitor.targets }}
+    - port: http
+      path: /pve
+      {{- with $.Values.serviceMonitor.interval }}
+      interval: {{ . }}
+      {{- end }}
+      {{- with $.Values.serviceMonitor.timeout }}
+      scrapeTimeout: {{ . }}
+      {{- end }}
+      params:
+        target:
+          - {{ . | quote }}
+        {{- with $.Values.serviceMonitor.params }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      relabelings:
+        - targetLabel: instance
+          replacement: {{ . | quote }}
+    {{- end }}
   namespaceSelector:
     matchNames:
-    - {{ .Release.Namespace | quote }}
+      - {{ .Release.Namespace | quote }}
   selector:
     matchLabels:
-      app: {{ template "prometheus-pve-exporter.name" . }}
-      release: {{ .Release.Name }}
+      {{- include "prometheus-pve-exporter.selectorLabels" . | nindent 6 }}
 {{- end }}

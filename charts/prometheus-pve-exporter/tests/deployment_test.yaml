@@ -25,14 +25,35 @@ tests:
           path: spec.template.spec.containers[0].image
           value: prompve/prometheus-pve-exporter:3.5.5
 
-  - it: mounts the generated pve.yml
+  - it: keeps the immutable selector of 1.x releases
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app: prometheus-pve-exporter
+            release: pve
+
+  - it: passes the v3 config flag and extra arguments
+    template: deployment.yaml
+    set:
+      extraArgs: [--no-collector.config, --log.level=debug]
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - --config.file=/etc/prometheus/pve.yml
+            - --no-collector.config
+            - --log.level=debug
+
+  - it: mounts the generated pve.yml where v3 reads it
     template: deployment.yaml
     asserts:
       - contains:
           path: spec.template.spec.containers[0].volumeMounts
           content:
             name: pve-config
-            mountPath: /etc/pve.yml
+            mountPath: /etc/prometheus/pve.yml
             readOnly: true
             subPath: pve.yml
       - contains:
@@ -41,6 +62,42 @@ tests:
             name: pve-config
             secret:
               secretName: pve-prometheus-pve-exporter
+
+  - it: mounts an existing Secret instead of generating one
+    set:
+      pve.existingSecret: pve-credentials
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: secret.yaml
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: pve-config
+            secret:
+              secretName: pve-credentials
+        template: deployment.yaml
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/config"]
+        template: deployment.yaml
+
+  - it: runs as the image user with a read-only root filesystem
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.runAsUser
+          value: 101
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
+          value: true
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: tmp
+            mountPath: /tmp
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
 
   - it: restarts the pod when the configuration changes
     template: deployment.yaml
@@ -52,14 +109,14 @@ tests:
     template: secret.yaml
     set:
       pve.user: prometheus@pve
-      pve.password: secret
+      pve.password: "s3cr#t: x"
     asserts:
       - equal:
           path: stringData["pve.yml"]
-          value: |-
+          value: |
             default:
+              password: 's3cr#t: x'
               user: prometheus@pve
-              password: secret
               verify_ssl: false
 
   - it: writes an API token instead of the password
@@ -73,9 +130,9 @@ tests:
     asserts:
       - equal:
           path: stringData["pve.yml"]
-          value: |-
+          value: |
             default:
-              user: prometheus@pve
               token_name: exporter
               token_value: 0000-1111
+              user: prometheus@pve
               verify_ssl: true

@@ -1,64 +1,92 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "prometheus-pve-exporter.fullname" . }}
+  name: {{ include "prometheus-pve-exporter.fullname" . }}
   labels:
-    app: {{ template "prometheus-pve-exporter.name" . }}
-    chart: {{ template "prometheus-pve-exporter.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "prometheus-pve-exporter.labels" . | nindent 4 }}
+    {{- include "prometheus-pve-exporter.selectorLabels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "prometheus-pve-exporter.name" . }}
-      release: {{ .Release.Name }}
+      {{- include "prometheus-pve-exporter.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      {{- if or .Values.podAnnotations (not .Values.pve.existingSecret) }}
       annotations:
+        {{- if not .Values.pve.existingSecret }}
         checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- end }}
       labels:
-        app: {{ template "prometheus-pve-exporter.name" . }}
-        release: {{ .Release.Name }}
+        {{- include "prometheus-pve-exporter.labels" . | nindent 8 }}
+        {{- include "prometheus-pve-exporter.selectorLabels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ template "prometheus-pve-exporter.serviceAccountName" . }}
+      serviceAccountName: {{ include "prometheus-pve-exporter.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --config.file=/etc/prometheus/pve.yml
+            {{- with .Values.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 9221
+              protocol: TCP
           livenessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 60
+            initialDelaySeconds: 10
           readinessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 60
+          {{- with .Values.resources }}
           resources:
-{{ toYaml .Values.resources | indent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
-          - name: pve-config
-            mountPath: "/etc/pve.yml"
-            readOnly: true
-            subPath: pve.yml
+            - name: pve-config
+              mountPath: /etc/prometheus/pve.yml
+              readOnly: true
+              subPath: pve.yml
+            - name: tmp
+              mountPath: /tmp
       volumes:
-      - name: pve-config
-        secret:
-          secretName: {{ template "prometheus-pve-exporter.fullname" . }}
-    {{- with .Values.nodeSelector }}
+        - name: pve-config
+          secret:
+            secretName: {{ include "prometheus-pve-exporter.secretName" . }}
+        - name: tmp
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.affinity }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
       affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

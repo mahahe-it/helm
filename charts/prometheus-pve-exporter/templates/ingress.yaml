@@ -1,38 +1,36 @@
-{{- if .Values.ingress.enabled -}}
-{{- $fullName := include "prometheus-pve-exporter.fullname" . -}}
-{{- $ingressPath := .Values.ingress.path -}}
-apiVersion: extensions/v1beta1
+{{- if .Values.ingress.enabled }}
+{{- include "prometheus-pve-exporter.requireHostnames" . }}
+{{- $fullName := include "prometheus-pve-exporter.fullname" . }}
+{{- $port := .Values.service.port }}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    app: {{ template "prometheus-pve-exporter.name" . }}
-    chart: {{ template "prometheus-pve-exporter.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-{{- with .Values.ingress.annotations }}
+    {{- include "prometheus-pve-exporter.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
   annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
-spec:
-{{- if .Values.ingress.tls }}
-  tls:
-  {{- range .Values.ingress.tls }}
-    - hosts:
-      {{- range .hosts }}
-        - {{ . }}
-      {{- end }}
-      secretName: {{ .secretName }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
-{{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ . }}
+    {{- range .Values.hostnames }}
+    - host: {{ . | quote }}
       http:
         paths:
-          - path: {{ $ingressPath }}
+          - path: /
+            pathType: Prefix
             backend:
-              serviceName: {{ $fullName }}
-              servicePort: http
-  {{- end }}
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $port }}
+    {{- end }}
 {{- end }}
