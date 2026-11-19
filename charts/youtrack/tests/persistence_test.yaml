@@ -1,0 +1,84 @@
+suite: persistence
+templates:
+  - deployment.yaml
+release:
+  name: yt
+tests:
+  - it: renders the same volume claims as 1.x by default
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates
+          value:
+            - metadata:
+                name: data
+              spec:
+                accessModes: [ReadWriteOnce]
+                resources:
+                  requests:
+                    storage: 10Gi
+            - metadata:
+                name: conf
+              spec:
+                accessModes: [ReadWriteOnce]
+                resources:
+                  requests:
+                    storage: 1Gi
+            - metadata:
+                name: logs
+              spec:
+                accessModes: [ReadWriteOnce]
+                resources:
+                  requests:
+                    storage: 2Gi
+            - metadata:
+                name: backups
+              spec:
+                accessModes: [ReadWriteOnce]
+                resources:
+                  requests:
+                    storage: 10Gi
+
+  - it: mounts every volume on its YouTrack directory
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts
+          value:
+            - name: data
+              mountPath: /opt/youtrack/data
+            - name: conf
+              mountPath: /opt/youtrack/conf
+            - name: logs
+              mountPath: /opt/youtrack/logs
+            - name: backups
+              mountPath: /opt/youtrack/backups
+
+  - it: applies the shared storage class to every volume
+    set:
+      persistence.storageClass: fast
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+          value: fast
+      - equal:
+          path: spec.volumeClaimTemplates[3].spec.storageClassName
+          value: fast
+
+  - it: lets a volume override size, storage class and access modes
+    set:
+      persistence.storageClass: fast
+      persistence.backups:
+        size: 50Gi
+        storageClass: cheap
+        accessModes: [ReadWriteMany]
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[3].spec
+          value:
+            accessModes: [ReadWriteMany]
+            storageClassName: cheap
+            resources:
+              requests:
+                storage: 50Gi
+      - equal:
+          path: spec.volumeClaimTemplates[0].spec.storageClassName
+          value: fast

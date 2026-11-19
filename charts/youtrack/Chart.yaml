@@ -3,7 +3,7 @@ name: youtrack
 description: A Helm chart to install YouTrack in your Kubernetes Cluster
 version: 1.0.0
 # renovate: datasource=docker depName=jetbrains/youtrack
-appVersion: "2022.2.55618"
+appVersion: "2026.2.19840"
 keywords:
   - youtrack
   - jetbrains
@@ -18,4 +18,4 @@ maintainers:
     name: Haloghen
 home: https://www.jetbrains.com/youtrack/
 sources:
-  - https://github.com/mahahe-it/helm/tree/master/charts/
+  - https://github.com/mahahe-it/helm/tree/main/charts/youtrack
