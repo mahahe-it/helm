@@ -1,0 +1,74 @@
+suite: httproute
+templates:
+  - httproute.yaml
+release:
+  name: vtt
+tests:
+  - it: is off by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: requires a Gateway
+    set:
+      httpRoute.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: httpRoute.parentRefs needs at least one Gateway
+
+  - it: requires a host name
+    set:
+      httpRoute.enabled: true
+      httpRoute.parentRefs: [{name: public}]
+      ingress.hostname: ""
+    asserts:
+      - failedTemplate:
+          errorMessage: hostnames needs at least one host for the HTTPRoute
+
+  - it: attaches to the Gateway for every host name
+    set:
+      hostnames: [vtt.example.com]
+      httpRoute.enabled: true
+      httpRoute.annotations:
+        example.com/team: rpg
+      httpRoute.parentRefs:
+        - name: public
+          namespace: gateway
+          sectionName: https
+    asserts:
+      - isKind:
+          of: HTTPRoute
+      - isAPIVersion:
+          of: gateway.networking.k8s.io/v1
+      - equal:
+          path: metadata.annotations["example.com/team"]
+          value: rpg
+      - equal:
+          path: spec.parentRefs[0]
+          value:
+            name: public
+            namespace: gateway
+            sectionName: https
+      - equal:
+          path: spec.hostnames
+          value: [vtt.example.com]
+      - equal:
+          path: spec.rules[0]
+          value:
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /
+            backendRefs:
+              - name: vtt-foundry-vtt
+                port: 80
+
+  - it: falls back to ingress.hostname when hostnames is empty
+    set:
+      httpRoute.enabled: true
+      httpRoute.parentRefs: [{name: public}]
+      ingress.hostname: old.example.com
+    asserts:
+      - equal:
+          path: spec.hostnames
+          value: [old.example.com]
