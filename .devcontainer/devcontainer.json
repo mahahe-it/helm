@@ -14,8 +14,7 @@
             "extensions": [
                 "ms-kubernetes-tools.vscode-kubernetes-tools",
                 "redhat.vscode-yaml",
-                "nefrob.vscode-just-syntax",
-                "budparr.language-hugo-vscode"
+                "nefrob.vscode-just-syntax"
             ]
         }
     }

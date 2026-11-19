@@ -90,8 +90,3 @@ test *args:
 # Run every pre-commit hook on the whole tree
 precommit:
     {{ tb }} pre-commit run --all-files
-
-# Serve the website at http://localhost:1313
-site:
-    git submodule update --init hugo/themes/terminal
-    {{ tb }} hugo server -s hugo --bind 0.0.0.0
