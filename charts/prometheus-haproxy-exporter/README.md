@@ -1,5 +1,12 @@
 # prometheus-haproxy-exporter
 
+> **Deprecated.** The upstream [haproxy_exporter](https://github.com/prometheus/haproxy_exporter)
+> is archived and v0.15.0 is its final release. HAProxy 2.0 and later expose
+> Prometheus metrics natively: enable the
+> [Prometheus exporter](https://www.haproxy.com/documentation/haproxy-configuration-tutorials/alerts-and-monitoring/prometheus/)
+> in HAProxy (`http-request use-service prometheus-exporter`) and scrape it
+> directly. This chart gets no further releases.
+
 ## TL;DR;
 
 ```console
@@ -14,7 +21,7 @@ This chart bootstraps a [haproxy exporter](https://github.com/prometheus/haproxy
 
 ## Prerequisites
 
-- Kubernetes 1.8+ with Beta APIs enabled
+- Kubernetes 1.25+
 
 ## Installing the Chart
 
@@ -45,8 +52,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | replicaCount | int | `1` | Number of exporter pods |
-| rbac.create | bool | `true` | Create the Role and RoleBinding for the exporter |
-| rbac.pspEnabled | bool | `false` | Create a PodSecurityPolicy (removed in Kubernetes 1.25) |
 | serviceAccount.create | bool | `true` | Create a ServiceAccount |
 | serviceAccount.name | string | `nil` | ServiceAccount name; generated from the fullname template when empty and `create` is true |
 
