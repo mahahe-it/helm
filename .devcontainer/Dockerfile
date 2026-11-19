@@ -22,8 +22,6 @@ ARG HELM_VERSION=4.3.2
 ARG CT_VERSION=3.15.0
 # renovate: datasource=github-releases depName=norwoodj/helm-docs extractVersion=^v(?<version>.+)$
 ARG HELM_DOCS_VERSION=1.14.2
-# renovate: datasource=github-releases depName=gohugoio/hugo extractVersion=^v(?<version>.+)$
-ARG HUGO_VERSION=0.170.1
 # renovate: datasource=github-releases depName=oras-project/oras extractVersion=^v(?<version>.+)$
 ARG ORAS_VERSION=1.4.0
 # renovate: datasource=github-releases depName=sigstore/cosign extractVersion=^v(?<version>.+)$
@@ -60,8 +58,6 @@ RUN set -eux; \
       | tar -xz --strip-components=1 linux-amd64/helm; \
     curl -fsSL https://github.com/norwoodj/helm-docs/releases/download/v${HELM_DOCS_VERSION}/helm-docs_${HELM_DOCS_VERSION}_Linux_x86_64.tar.gz \
       | tar -xz helm-docs; \
-    curl -fsSL https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.tar.gz \
-      | tar -xz hugo; \
     curl -fsSL https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/oras_${ORAS_VERSION}_linux_amd64.tar.gz \
       | tar -xz oras; \
     curl -fsSL https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz \
