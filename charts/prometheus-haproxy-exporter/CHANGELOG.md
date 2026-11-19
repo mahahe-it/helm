@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/mahahe-it/helm/compare/prometheus-haproxy-exporter-1.0.1...prometheus-haproxy-exporter-2.0.0) (2026-11-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* **prometheus-haproxy-exporter:** deprecate the chart ([#87](https://github.com/mahahe-it/helm/issues/87))
+
+### Features
+
+* **prometheus-haproxy-exporter:** deprecate the chart ([#87](https://github.com/mahahe-it/helm/issues/87)) ([535fdb2](https://github.com/mahahe-it/helm/commit/535fdb27148d0b492e5823e1c51eaa2a85328f4e))
+
 ## [1.0.1](https://github.com/mahahe-it/helm/compare/prometheus-haproxy-exporter-1.0.0...prometheus-haproxy-exporter-1.0.1) (2026-11-18)
 
 

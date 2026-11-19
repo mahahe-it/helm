@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/mahahe-it/helm/compare/prometheus-pve-exporter-1.0.1...prometheus-pve-exporter-2.0.0) (2026-11-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* **prometheus-pve-exporter:** prometheus-pve-exporter v3 ([#86](https://github.com/mahahe-it/helm/issues/86))
+
+### Features
+
+* **prometheus-pve-exporter:** prometheus-pve-exporter v3 ([#86](https://github.com/mahahe-it/helm/issues/86)) ([d375ac2](https://github.com/mahahe-it/helm/commit/d375ac233680fd28b084a17c277b57362da7dd4e))
+
 ## [1.0.1](https://github.com/mahahe-it/helm/compare/prometheus-pve-exporter-1.0.0...prometheus-pve-exporter-1.0.1) (2026-11-18)
 
 

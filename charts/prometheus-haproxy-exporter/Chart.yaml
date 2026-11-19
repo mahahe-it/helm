@@ -1,9 +1,7 @@
 apiVersion: v2
 name: prometheus-haproxy-exporter
-description: DEPRECATED. Prometheus exporter for HAProxy metrics; use the native HAProxy Prometheus endpoint instead.
-deprecated: true
-kubeVersion: ">=1.25.0-0"
-version: 1.0.1
+description: A Helm chart to export the metrics from haproxy in Prometheus format.
+version: 2.0.0
 # renovate: datasource=docker depName=quay.io/prometheus/haproxy-exporter
 appVersion: "v0.15.0"
 keywords:
@@ -24,4 +22,4 @@ maintainers:
 home: https://github.com/prometheus/haproxy_exporter
 sources:
   - https://github.com/prometheus/haproxy_exporter
-  - https://github.com/mahahe-it/helm/tree/main/charts/prometheus-haproxy-exporter
+  - https://github.com/mahahe-it/helm/tree/master/charts/
