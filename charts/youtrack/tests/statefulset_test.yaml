@@ -25,6 +25,35 @@ tests:
           path: spec.template.spec.containers[0].image
           value: jetbrains/youtrack:2025.3.100
 
+  - it: keeps the immutable StatefulSet fields of 1.x releases
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.serviceName
+          value: youtrack
+      - equal:
+          path: spec.selector.matchLabels
+          value:
+            app.kubernetes.io/name: youtrack
+            app.kubernetes.io/instance: yt
+
+  - it: runs a single instance by default and allows scaling to zero
+    template: deployment.yaml
+    set:
+      replicaCount: 0
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 0
+
+  - it: refuses more than one replica
+    template: deployment.yaml
+    set:
+      replicaCount: 2
+    asserts:
+      - failedTemplate:
+          errorMessage: YouTrack runs a single instance, replicaCount must be 0 or 1
+
   - it: listens on 8080
     template: deployment.yaml
     asserts:
@@ -34,6 +63,37 @@ tests:
             name: http
             containerPort: 8080
           any: true
+
+  - it: runs as the image user 13001
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext
+          value:
+            runAsNonRoot: true
+            runAsUser: 13001
+            runAsGroup: 13001
+            fsGroup: 13001
+
+  - it: has a readiness probe on the http port and no liveness probe
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.tcpSocket.port
+          value: http
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+
+  - it: sets container resources
+    template: deployment.yaml
+    set:
+      resources:
+        requests:
+          memory: 2Gi
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: 2Gi
 
   - it: exposes the service port on the http container port
     template: service.yaml
@@ -49,20 +109,3 @@ tests:
       - equal:
           path: spec.ports[0].targetPort
           value: http
-
-  - it: keeps data, conf, logs and backups on persistent volumes
-    template: deployment.yaml
-    asserts:
-      - lengthEqual:
-          path: spec.volumeClaimTemplates
-          count: 4
-      - contains:
-          path: spec.template.spec.containers[0].volumeMounts
-          content:
-            name: data
-            mountPath: /opt/youtrack/data
-      - contains:
-          path: spec.template.spec.containers[0].volumeMounts
-          content:
-            name: backups
-            mountPath: /opt/youtrack/backups

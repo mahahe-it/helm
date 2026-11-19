@@ -1,0 +1,92 @@
+suite: upgrade guard
+templates:
+  - deployment.yaml
+release:
+  name: yt
+  namespace: tools
+chart:
+  appVersion: 2026.2.1
+tests:
+  - it: installs when no StatefulSet exists yet
+    asserts:
+      - isKind:
+          of: StatefulSet
+
+  - it: refuses to jump from 2022.2 to the chart appVersion
+    kubernetesProvider:
+      scheme:
+        "apps/v1/StatefulSet":
+          gvr:
+            group: apps
+            version: v1
+            resource: statefulsets
+          namespaced: true
+      objects:
+        - apiVersion: apps/v1
+          kind: StatefulSet
+          metadata:
+            name: yt-youtrack
+            namespace: tools
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: youtrack
+                    image: jetbrains/youtrack:2022.2.55618
+    asserts:
+      - failedTemplate:
+          errorMessage: "YouTrack 2022.2.55618 cannot be upgraded to 2026.2.1 in one step: set image.tag to the next version of the upgrade path (see Upgrading in the chart README)"
+
+  - it: allows an intermediate step with image.tag
+    kubernetesProvider:
+      scheme:
+        "apps/v1/StatefulSet":
+          gvr:
+            group: apps
+            version: v1
+            resource: statefulsets
+          namespaced: true
+      objects:
+        - apiVersion: apps/v1
+          kind: StatefulSet
+          metadata:
+            name: yt-youtrack
+            namespace: tools
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: youtrack
+                    image: jetbrains/youtrack:2022.2.55618
+    set:
+      image.tag: 2023.1.22653
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: jetbrains/youtrack:2023.1.22653
+
+  - it: upgrades from 2025.3 to the chart appVersion
+    kubernetesProvider:
+      scheme:
+        "apps/v1/StatefulSet":
+          gvr:
+            group: apps
+            version: v1
+            resource: statefulsets
+          namespaced: true
+      objects:
+        - apiVersion: apps/v1
+          kind: StatefulSet
+          metadata:
+            name: yt-youtrack
+            namespace: tools
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: youtrack
+                    image: jetbrains/youtrack:2025.3.172487
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: jetbrains/youtrack:2026.2.1

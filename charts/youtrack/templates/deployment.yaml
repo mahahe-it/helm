@@ -1,28 +1,37 @@
+{{- if gt (int .Values.replicaCount) 1 }}
+{{- fail "YouTrack runs a single instance, replicaCount must be 0 or 1" }}
+{{- end }}
+{{- include "youtrack.upgradeGuard" . }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "..fullname" . }}
+  name: {{ include "youtrack.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "..name" . }}
-    helm.sh/chart: {{ include "..chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "youtrack.labels" . | nindent 4 }}
 spec:
-  serviceName: {{ include "..name" . }}
+  {{- /* serviceName and selector are immutable: unchanged since 1.x */}}
+  serviceName: {{ include "youtrack.name" . }}
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "..name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "youtrack.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "..name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- include "youtrack.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
-        fsGroup: 13001
-        runAsUser: 13001
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -31,55 +40,44 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
-            - name: data
-              mountPath: /opt/youtrack/data
-            - name: conf
-              mountPath: /opt/youtrack/conf
-            - name: logs
-              mountPath: /opt/youtrack/logs
-            - name: backups
-              mountPath: /opt/youtrack/backups
+            {{- range $name := list "data" "conf" "logs" "backups" }}
+            - name: {{ $name }}
+              mountPath: /opt/youtrack/{{ $name }}
+            {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.affinity }}
+      {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
+  {{- /* volumeClaimTemplates are immutable: the defaults render as in 1.x */}}
   volumeClaimTemplates:
+    {{- range $name := list "data" "conf" "logs" "backups" }}
+    {{- $vol := index $.Values.persistence $name }}
     - metadata:
-        name: data
+        name: {{ $name }}
       spec:
-        accessModes: [ "ReadWriteOnce" ]
+        accessModes:
+          {{- toYaml $vol.accessModes | nindent 10 }}
+        {{- with $vol.storageClass | default $.Values.persistence.storageClass }}
+        storageClassName: {{ . | quote }}
+        {{- end }}
         resources:
           requests:
-            storage: 10Gi
-    - metadata:
-        name: conf
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 1Gi
-    - metadata:
-        name: logs
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 2Gi
-    - metadata:
-        name: backups
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 10Gi
+            storage: {{ $vol.size }}
+    {{- end }}
