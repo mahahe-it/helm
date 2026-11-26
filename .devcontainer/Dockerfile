@@ -8,7 +8,7 @@ ARG PIPX_VERSION=1.7.1*
 ARG JQ_VERSION=1.7.1*
 # single-file release binaries
 # renovate: datasource=github-releases depName=kubernetes/kubernetes extractVersion=^v(?<version>.+)$
-ARG KUBECTL_VERSION=1.37.2
+ARG KUBECTL_VERSION=1.37.3
 # renovate: datasource=github-releases depName=mikefarah/yq extractVersion=^v(?<version>.+)$
 ARG YQ_VERSION=4.54.3
 # renovate: datasource=github-releases depName=kubernetes-sigs/kind extractVersion=^v(?<version>.+)$
@@ -25,9 +25,9 @@ ARG HELM_DOCS_VERSION=1.14.2
 # renovate: datasource=github-releases depName=oras-project/oras extractVersion=^v(?<version>.+)$
 ARG ORAS_VERSION=1.4.0
 # renovate: datasource=github-releases depName=sigstore/cosign extractVersion=^v(?<version>.+)$
-ARG COSIGN_VERSION=3.1.4
+ARG COSIGN_VERSION=3.1.6
 # renovate: datasource=github-releases depName=cli/cli extractVersion=^v(?<version>.+)$
-ARG GH_VERSION=2.105.0
+ARG GH_VERSION=2.106.0
 # helm plugins
 # renovate: datasource=github-releases depName=helm-unittest/helm-unittest extractVersion=^v(?<version>.+)$
 ARG HELM_UNITTEST_VERSION=1.2.1
